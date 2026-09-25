@@ -1,0 +1,868 @@
+<title>Expo Taxi · Día 1</title>
+<meta name="description" content="Guía de campo para observar el stand de Socio Conductor en Expo Taxi: plan del día, contador en vivo, guía de entrevistas, evaluación de replicabilidad y reporte.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#EEF0EE; --surface:#FFFFFF; --surface-2:#F6F7F5; --ink:#1B1F24; --ink-2:#3C434C; --muted:#5E6772;
+  --line:#D5D9D6; --accent:#F2B705; --accent-soft:#FCEFC2; --accent-ink:#7A5A00; --on-accent:#1B1F24;
+  --good:#2E7D4F; --warn:#A35F00; --bad:#B3261E; --good-soft:#E3F1E8; --warn-soft:#FBEBD3; --bad-soft:#F8E1DF;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121518; --surface:#1B1F24; --surface-2:#22272D; --ink:#ECEDEA; --ink-2:#C9CDD1; --muted:#98A1AB;
+    --line:#2F353D; --accent:#F5C22B; --accent-soft:#3A3113; --accent-ink:#F5C22B; --on-accent:#1B1F24;
+    --good:#6CC08F; --warn:#E6A23C; --bad:#F08A80; --good-soft:#18301F; --warn-soft:#3A2A12; --bad-soft:#3B1C1A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121518; --surface:#1B1F24; --surface-2:#22272D; --ink:#ECEDEA; --ink-2:#C9CDD1; --muted:#98A1AB;
+  --line:#2F353D; --accent:#F5C22B; --accent-soft:#3A3113; --accent-ink:#F5C22B; --on-accent:#1B1F24;
+  --good:#6CC08F; --warn:#E6A23C; --bad:#F08A80; --good-soft:#18301F; --warn-soft:#3A2A12; --bad-soft:#3B1C1A;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:16px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:2rem;font-weight:700;letter-spacing:.01em}
+h3{font-size:1.3rem;font-weight:600}
+p{margin:0;max-width:68ch}
+.muted{color:var(--muted)}
+.eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header */
+header.top{background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{display:grid;gap:10px;padding-block:22px 18px}
+.title-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;justify-content:space-between}
+header.top h1{font-size:clamp(2.2rem,6vw,3.2rem);font-weight:700;text-transform:uppercase;letter-spacing:.01em}
+header.top h1 span{background:var(--accent);color:var(--on-accent);padding:0 .18em}
+.checker{height:12px;background-color:var(--ink);background-image:
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%),
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%);
+  background-size:12px 12px;background-position:0 0,6px 6px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.92rem;color:var(--ink-2)}
+.meta b{font-weight:600}
+
+/* Tabs */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.tabs-scroll{overflow-x:auto;scrollbar-width:thin}
+.tabs-list{display:flex;gap:2px;max-width:1040px;margin:0 auto;padding-inline:8px}
+.tab{appearance:none;border:0;background:none;color:var(--muted);font-family:var(--display);font-size:1.02rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:12px 12px 10px;border-bottom:4px solid transparent;cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tab .badge{font-family:var(--mono);font-size:.7rem;margin-left:6px;padding:1px 5px;background:var(--accent-soft);color:var(--accent-ink);border-radius:3px;vertical-align:2px}
+
+main .wrap{padding-block:26px 64px}
+section.panel{display:grid;gap:22px}
+.lead{font-size:1.08rem;color:var(--ink-2)}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:grid;gap:10px;align-content:start}
+.block{display:grid;gap:12px}
+ul.list{margin:0;padding-left:1.1em;display:grid;gap:6px}
+ul.list li::marker{color:var(--accent-ink)}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 6px 6px 0;display:grid;gap:4px}
+.callout p{color:var(--ink)}
+
+/* Timeline */
+ol.timeline{list-style:none;margin:0;padding:0;display:grid;gap:0}
+ol.timeline li{display:grid;grid-template-columns:78px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+ol.timeline li:first-child{border-top:0}
+.tl-time{font-family:var(--mono);font-size:.82rem;color:var(--accent-ink);padding-top:3px}
+.tl-body{display:grid;gap:4px}
+.tl-body h3{font-size:1.2rem}
+
+/* Checklist */
+.checks{display:grid;gap:4px}
+.check{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.check input{margin-top:5px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.check span{flex:1}
+.check input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+
+/* Rating */
+.rate-row{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.rate-row:first-of-type{border-top:0}
+.rate-row small{display:block;color:var(--muted);font-size:.85rem;line-height:1.35}
+.rate{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.rate button{appearance:none;border:0;border-left:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-family:var(--mono);font-size:.9rem;width:36px;height:34px;cursor:pointer}
+.rate button:first-child{border-left:0}
+.rate button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:500}
+.rate button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+@media (max-width:520px){.rate-row{grid-template-columns:1fr}}
+
+/* Forms */
+label.f{display:grid;gap:4px;font-size:.9rem;color:var(--ink-2)}
+input[type=text],input[type=number],select,textarea{font:inherit;font-size:.98rem;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:8px 10px;width:100%}
+textarea{min-height:92px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.btn{appearance:none;font-family:var(--display);font-weight:600;font-size:1rem;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--ink);background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:5px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.yellow{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.danger{background:transparent;border-color:var(--bad);color:var(--bad)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* Counter */
+.counters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.counter{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;grid-template-rows:auto 1fr auto;gap:8px}
+.counter.funnel-step{border-top:4px solid var(--accent)}
+.counter .c-label{font-family:var(--display);font-size:1.15rem;font-weight:600;line-height:1.15}
+.counter .c-help{font-size:.84rem;color:var(--muted);line-height:1.35}
+.counter .c-foot{display:flex;align-items:center;gap:10px}
+.counter .c-val{font-family:var(--mono);font-size:2.2rem;font-weight:500;flex:1;font-variant-numeric:tabular-nums}
+.counter button{appearance:none;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:6px;font-family:var(--mono);font-size:1.4rem;cursor:pointer;height:52px}
+.counter .minus{width:44px}
+.counter .plus{width:72px;background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+.counter button:active{transform:translateY(1px)}
+.counter button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.funnel{display:grid;gap:10px}
+.f-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr 64px;gap:12px;align-items:center}
+.f-name{font-size:.92rem;color:var(--ink-2);line-height:1.25}
+.f-track{height:22px;background:var(--surface-2);border-radius:0 4px 4px 0;position:relative}
+.f-bar{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:0 4px 4px 0;min-width:2px;transition:width .25s}
+.f-val{font-family:var(--mono);font-size:.9rem;text-align:right;font-variant-numeric:tabular-nums}
+.f-conv{grid-column:2/4;font-family:var(--mono);font-size:.76rem;color:var(--muted);margin-top:-6px}
+@media (max-width:520px){.f-row{grid-template-columns:1fr 56px}.f-name{grid-column:1/3}.f-conv{grid-column:1/3}}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--mono);font-weight:500;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.hbar{display:inline-block;height:10px;background:var(--accent);border-radius:0 3px 3px 0;vertical-align:middle;margin-right:8px}
+tr.peak td{background:var(--accent-soft)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:grid;gap:2px}
+.kpi b{font-family:var(--mono);font-size:1.5rem;font-weight:500;font-variant-numeric:tabular-nums}
+.kpi span{font-size:.84rem;color:var(--muted);line-height:1.3}
+
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.76rem;padding:3px 8px;border-radius:3px;letter-spacing:.03em}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.neutral{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+
+/* Entries */
+.entries{display:grid;gap:8px}
+.entry{background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:start}
+.entry .tags{display:flex;flex-wrap:wrap;gap:6px}
+.entry q{font-style:italic;color:var(--ink-2)}
+.entry .del{appearance:none;border:0;background:none;color:var(--muted);cursor:pointer;font-size:.85rem;text-decoration:underline}
+
+/* Score */
+.score{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.score-num{font-family:var(--display);font-size:4rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score-num small{font-size:1.4rem;color:var(--muted);font-weight:500}
+.meter{height:12px;background:var(--surface-2);border-radius:0 6px 6px 0;position:relative;border:1px solid var(--line)}
+.meter i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:0 6px 6px 0}
+.meter .mark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--muted)}
+.w{font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+
+/* Insights */
+.insight{display:grid;gap:6px;padding:14px 0;border-top:1px solid var(--line)}
+.insight:first-child{border-top:0;padding-top:0}
+.insight h3{font-size:1.18rem}
+.risk{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+
+pre.report{white-space:pre-wrap;font-family:var(--mono);font-size:.86rem;line-height:1.55;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;margin:0;max-height:560px;overflow:auto}
+.confirm{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--bad);border-radius:5px;background:var(--bad-soft)}
+.toast{font-family:var(--mono);font-size:.82rem;color:var(--good)}
+footer{padding-block:0 40px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Innovación y Estrategia · Guía de campo</div>
+    <div class="title-row">
+      <h1>Expo Taxi <span>Día 1</span></h1>
+      <div class="meta"><span>Proyecto observado: <b>Socio Conductor</b></span><span>Objetivo: <b>medir, entender y decidir si se replica</b></span></div>
+    </div>
+  </div>
+  <div class="checker" aria-hidden="true"></div>
+</header>
+
+<nav class="tabs" aria-label="Secciones">
+  <div class="tabs-scroll">
+    <div class="tabs-list" role="tablist" id="tablist">
+      <button class="tab" role="tab" data-tab="mision" id="tab-mision">Misión</button>
+      <button class="tab" role="tab" data-tab="plan" id="tab-plan">Plan del día</button>
+      <button class="tab" role="tab" data-tab="contador" id="tab-contador">Contador<span class="badge num" id="badge-count">0</span></button>
+      <button class="tab" role="tab" data-tab="stand" id="tab-stand">Stand y promotores</button>
+      <button class="tab" role="tab" data-tab="conductores" id="tab-conductores">Conductores<span class="badge num" id="badge-iv">0</span></button>
+      <button class="tab" role="tab" data-tab="evento" id="tab-evento">Evento y competencia</button>
+      <button class="tab" role="tab" data-tab="replicar" id="tab-replicar">¿Lo replicamos?</button>
+      <button class="tab" role="tab" data-tab="insights" id="tab-insights">Insights</button>
+      <button class="tab" role="tab" data-tab="reporte" id="tab-reporte">Reporte</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+<!-- MISIÓN -->
+<section class="panel" role="tabpanel" id="p-mision" aria-labelledby="tab-mision">
+  <div class="block">
+    <h2>A qué vas y qué tienes que traer de vuelta</h2>
+    <p class="lead">Vas como ojos del equipo. No basta con decir “estuvo lleno” o “estuvo flojo”: tu jefe necesita números, evidencia y una recomendación clara sobre si este formato sirve para nuestra empresa.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="eyebrow">Lo que pidió tu jefe</div>
+      <ul class="list">
+        <li>¿Cuántos conductores llegan al evento y al stand?</li>
+        <li>¿Hay recurrencia? ¿Vuelven, ya conocían el proyecto, piensan volver?</li>
+        <li>¿Cómo trabajan los promotores para llamar la atención?</li>
+        <li>¿Qué tal es el evento y cómo es su dinámica?</li>
+        <li>¿Se ve bien el stand de Socio Conductor?</li>
+        <li>Hablar con conductores directamente.</li>
+        <li>¿Se puede replicar con nuestra empresa?</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Lo que te sugiero sumar</div>
+      <ul class="list">
+        <li><b>Embudo completo:</b> pasan → se detienen → conversan → se registran. El conteo solo de “visitas” no dice nada.</li>
+        <li><b>Costo por registro</b> (CPL): cuánto costó el stand + personal dividido entre registros.</li>
+        <li><b>Calidad del público:</b> qué parte son conductores activos y qué parte son curiosos o familias.</li>
+        <li><b>Visita incógnita</b> al stand, como si fueras conductor.</li>
+        <li><b>Competencia:</b> quién más capta conductores y con qué gancho.</li>
+        <li><b>Línea base del día 1</b> para comparar con los siguientes días.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="eyebrow">Por qué importa que sea el primer día</div>
+    <p>El día 1 es tu línea base. Suele ser más flojo (la difusión recién arranca) o más lleno (hay inauguración). Anota cuál de los dos es, pide al organizador el aforo esperado para los otros días y deja sembrada la recurrencia: pregunta a cada conductor si volverá y márcalo en el contador.</p>
+  </div>
+  <div class="card">
+    <div class="eyebrow">Tus 3 entregables</div>
+    <div class="grid-3">
+      <div class="block"><h3>1 · Números</h3><p class="muted">Embudo por hora, hora pico, % de registro, recurrencia y costo por registro.</p></div>
+      <div class="block"><h3>2 · Evidencia</h3><p class="muted">Fotos del stand, del pasillo en hora pico y de la competencia, más frases textuales de conductores.</p></div>
+      <div class="block"><h3>3 · Recomendación</h3><p class="muted">Replicar, replicar con ajustes o no replicar, con la puntuación de la pestaña “¿Lo replicamos?”.</p></div>
+    </div>
+  </div>
+  <p class="muted">Todo lo que marques o escribas aquí se guarda en este navegador. En la pestaña <b>Reporte</b> se arma el resumen automático para enviárselo a tu jefe.</p>
+</section>
+
+<!-- PLAN -->
+<section class="panel" role="tabpanel" id="p-plan" aria-labelledby="tab-plan" hidden>
+  <div class="block">
+    <h2>Plan del día, bloque por bloque</h2>
+    <p class="lead">Ajusta las horas al horario real del evento. El orden sí importa: primero observas sin que te conozcan, luego mides y al final preguntas.</p>
+  </div>
+  <div class="card">
+    <div class="eyebrow">Antes de salir</div>
+    <div class="checks" id="prep">
+      <label class="check"><input type="checkbox" id="pre1" data-k><span>Celular cargado + batería externa. Espacio para fotos y videos.</span></label>
+      <label class="check"><input type="checkbox" id="pre2" data-k><span>Revisar redes y web del evento: horario, expositores, actividades, precio de entrada.</span></label>
+      <label class="check"><input type="checkbox" id="pre3" data-k><span>Confirmar con tu jefe las 3 preguntas que sí o sí debes responder.</span></label>
+      <label class="check"><input type="checkbox" id="pre4" data-k><span>Saber cómo presentarte si te preguntan (nombre, área, motivo) y qué <b>no</b> decir de nuestra empresa.</span></label>
+      <label class="check"><input type="checkbox" id="pre5" data-k><span>Averiguar si alguien de Socio Conductor sabe que vas (cambia cómo te van a tratar).</span></label>
+    </div>
+  </div>
+  <div class="card">
+    <ol class="timeline">
+      <li><div class="tl-time">Llegada<br>30 min</div><div class="tl-body"><h3>Recorrido completo sin identificarte</h3><p class="muted">Da una vuelta entera. Ubica entradas, pasillos con más tránsito, zona de comida, escenario y dónde quedó el stand de Socio Conductor. Toma una foto general y una del stand desde 10 metros.</p></div></li>
+      <li><div class="tl-time">+30 min<br>10 min</div><div class="tl-body"><h3>Visita incógnita al stand</h3><p class="muted">Pasa como un conductor más. Mide cuánto tardan en abordarte, qué te dicen primero, si entiendes el beneficio en 5 segundos y qué te piden para registrarte. Anótalo en “Stand y promotores”.</p></div></li>
+      <li><div class="tl-time">Cada hora<br>10 min</div><div class="tl-body"><h3>Conteo por bloques</h3><p class="muted">Párate en un punto fijo con vista al stand y cuenta 10 minutos con la pestaña Contador. Repite cada hora. Así comparas horas sin tener que contar todo el día.</p></div></li>
+      <li><div class="tl-time">Entre conteos</div><div class="tl-body"><h3>Conversaciones con conductores</h3><p class="muted">Meta: 10 a 15 conversaciones de 3 a 5 minutos. La mitad cerca del stand y la otra mitad lejos (zona de comida, salida), para no escuchar solo a los que ya se interesaron.</p></div></li>
+      <li><div class="tl-time">Hora tranquila</div><div class="tl-body"><h3>Charla con el equipo del stand</h3><p class="muted">Ya identificado. Pregunta su meta del día, cuántos registros llevan, qué mensaje funciona mejor, qué les preguntan más y qué harían distinto.</p></div></li>
+      <li><div class="tl-time">Media tarde</div><div class="tl-body"><h3>Recorrido de competencia</h3><p class="muted">Anota qué otras marcas buscan conductores (apps, financieras, aseguradoras, concesionarios, GNV) y qué gancho usan. Foto de los 2 o 3 stands con más gente.</p></div></li>
+      <li><div class="tl-time">Hora pico</div><div class="tl-body"><h3>Evidencia del ambiente</h3><p class="muted">Video corto de 15 segundos del pasillo y del stand. Te servirá para mostrar el tráfico real más que cualquier número.</p></div></li>
+      <li><div class="tl-time">Cierre</div><div class="tl-body"><h3>Dato oficial y reporte en caliente</h3><p class="muted">Pide al organizador el aforo del día y el esperado para los demás días. Pide al stand su número de registros. Antes de irte, dedica 20 minutos a completar la pestaña Reporte mientras lo tienes fresco.</p></div></li>
+    </ol>
+  </div>
+  <div class="callout">
+    <div class="eyebrow">Recurrencia: cómo medirla desde el día 1</div>
+    <p>Hoy no puedes ver quién vuelve mañana, pero sí puedes dejarlo medible: marca en el contador a quienes ya conocían Socio Conductor o regresan al stand, pregunta a cada conductor si piensa volver y, si hay confianza con el equipo del stand, sugiere pedir el número de placa o DNI al registrar para detectar duplicados en los días siguientes.</p>
+  </div>
+</section>
+
+<!-- CONTADOR -->
+<section class="panel" role="tabpanel" id="p-contador" aria-labelledby="tab-contador" hidden>
+  <div class="block">
+    <h2>Contador en vivo</h2>
+    <p class="lead">Toca <b>+</b> cada vez que ocurra. Cada toque guarda la hora, así el desglose por hora se arma solo. Si te equivocas, usa <b>−</b>.</p>
+  </div>
+  <div class="eyebrow">Embudo del stand</div>
+  <div class="counters" id="counters-funnel"></div>
+  <div class="eyebrow">Recurrencia y esfuerzo</div>
+  <div class="counters" id="counters-extra"></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Embudo acumulado</h3>
+      <div class="funnel" id="funnel"></div>
+    </div>
+    <div class="card">
+      <h3>Datos del conteo</h3>
+      <label class="f" for="minHora">Minutos que cuentas por hora
+        <input type="number" id="minHora" data-k min="1" max="60" value="10" inputmode="numeric">
+      </label>
+      <p class="muted" style="font-size:.88rem">Si cuentas 10 minutos por hora, cada número se multiplica por 6 para estimar la hora completa. Pon 60 si cuentas todo el tiempo.</p>
+      <div class="kpis" id="count-kpis"></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3>Desglose por hora</h3>
+    <div class="table-wrap"><table id="hourly"></table></div>
+    <p class="muted" style="font-size:.88rem">La fila resaltada es la hora pico según los conductores que pasan. Las barras comparan esa columna entre horas.</p>
+  </div>
+</section>
+
+<!-- STAND -->
+<section class="panel" role="tabpanel" id="p-stand" aria-labelledby="tab-stand" hidden>
+  <div class="block">
+    <h2>Stand y promotores</h2>
+    <p class="lead">Califica de 1 (muy mal) a 5 (excelente). Lo que puntúe 1 o 2 es una debilidad que debes documentar con foto y una frase.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>El stand</h3>
+      <div id="rates-stand"></div>
+      <div class="kpis"><div class="kpi"><b id="avg-stand">–</b><span>Promedio del stand</span></div></div>
+    </div>
+    <div class="card">
+      <h3>Los promotores</h3>
+      <div id="rates-prom"></div>
+      <div class="kpis"><div class="kpi"><b id="avg-prom">–</b><span>Promedio de promotores</span></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Visita incógnita</h3>
+    <div class="form-grid">
+      <label class="f" for="nProm">Promotores en el stand<input type="number" id="nProm" data-k min="0" inputmode="numeric"></label>
+      <label class="f" for="tAbordaje">Segundos hasta que te abordaron<input type="number" id="tAbordaje" data-k min="0" inputmode="numeric"></label>
+      <label class="f" for="tPitch">Duración del pitch (min)<input type="number" id="tPitch" data-k min="0" step="0.5" inputmode="decimal"></label>
+      <label class="f" for="regPide">Qué piden para registrarte<input type="text" id="regPide" data-k placeholder="DNI, celular, placa, brevete…"></label>
+    </div>
+    <label class="f" for="primeraFrase">Lo primero que te dijeron (textual)<input type="text" id="primeraFrase" data-k placeholder="“Maestro, ¿ya conoce Socio Conductor?…”"></label>
+    <label class="f" for="notasStand">Notas del stand y promotores<textarea id="notasStand" data-k placeholder="Qué funciona, qué no, qué copiarías, qué evitarías…"></textarea></label>
+  </div>
+  <div class="card">
+    <div class="eyebrow">Qué observar además</div>
+    <ul class="list">
+      <li>¿Los promotores salen al pasillo o esperan detrás de una mesa? Salir multiplica los abordajes.</li>
+      <li>¿Su energía se mantiene en la tarde o decae? Compara la misma observación a las 11 y a las 17 h.</li>
+      <li>¿Hablan en el idioma del conductor (ganancias por día, comisión, pagos) o en lenguaje de marca?</li>
+      <li>¿Qué hacen con quien no se registra? ¿Le dan algo para después (QR, volante, WhatsApp)?</li>
+      <li>¿Hay cola o saturación? Si la gente se va por esperar, faltan manos o el registro es muy largo.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- CONDUCTORES -->
+<section class="panel" role="tabpanel" id="p-conductores" aria-labelledby="tab-conductores" hidden>
+  <div class="block">
+    <h2>Conversaciones con conductores</h2>
+    <p class="lead">Preséntate, pide 3 minutos y conversa como pregunta de curiosidad, no como encuesta. Pide permiso antes de tomar fotos o anotar su nombre.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="eyebrow">Guía de preguntas</div>
+      <h3>Perfil</h3>
+      <ul class="list"><li>¿Hace cuánto manejas? ¿Taxi, app o los dos?</li><li>¿El carro es tuyo, alquilado o lo estás pagando?</li><li>¿Cuántas horas manejas al día?</li></ul>
+      <h3>El evento</h3>
+      <ul class="list"><li>¿Cómo te enteraste de la expo? ¿Qué viniste a buscar?</li><li>¿Vas a volver otro día? ¿Por qué?</li></ul>
+      <h3>Socio Conductor</h3>
+      <ul class="list"><li>¿Ya lo conocías? ¿Qué entendiste que te ofrecen?</li><li>¿Te registraste? Si no, ¿qué te frenó?</li><li>¿Qué te convencería de probarlo?</li></ul>
+      <h3>Su día a día</h3>
+      <ul class="list"><li>¿Qué es lo más difícil de tu trabajo hoy?</li><li>¿Qué te haría cambiar de empresa o de app?</li><li>¿Conoces [nuestra empresa]? ¿Qué piensas de ella?</li></ul>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Registrar conversación</div>
+      <div class="form-grid">
+        <label class="f" for="iv_perfil">Tipo de conductor
+          <select id="iv_perfil"><option>Taxi formal</option><option>App (Uber, InDrive, DiDi…)</option><option>Taxi + app</option><option>Colectivo / otro</option><option>Aún no maneja</option></select></label>
+        <label class="f" for="iv_auto">Vehículo
+          <select id="iv_auto"><option>Propio</option><option>Alquilado</option><option>Financiado</option><option>No sabe</option></select></label>
+        <label class="f" for="iv_conocia">¿Conocía Socio Conductor?
+          <select id="iv_conocia"><option>No</option><option>Sí</option></select></label>
+        <label class="f" for="iv_reg">¿Se registró?
+          <select id="iv_reg"><option>No</option><option>Sí</option><option>Lo pensará</option></select></label>
+        <label class="f" for="iv_vuelve">¿Volverá a la expo?
+          <select id="iv_vuelve"><option>Tal vez</option><option>Sí</option><option>No</option></select></label>
+      </div>
+      <label class="f" for="iv_dolor">Principal problema o necesidad<input type="text" id="iv_dolor" placeholder="Comisiones altas, pagos tardíos, inseguridad…"></label>
+      <label class="f" for="iv_quote">Frase textual que valga la pena<input type="text" id="iv_quote" placeholder="Lo que dijo, con sus palabras"></label>
+      <div class="row"><button class="btn yellow" id="iv_add" type="button">Guardar conversación</button><span class="toast" id="iv_toast" aria-live="polite"></span></div>
+    </div>
+  </div>
+  <div class="kpis" id="iv-kpis"></div>
+  <div class="block">
+    <h3>Conversaciones guardadas</h3>
+    <div class="entries" id="iv-list"></div>
+  </div>
+</section>
+
+<!-- EVENTO -->
+<section class="panel" role="tabpanel" id="p-evento" aria-labelledby="tab-evento" hidden>
+  <div class="block">
+    <h2>El evento y la competencia</h2>
+    <p class="lead">Para decidir si se replica, necesitas entender el evento en sí, no solo el stand.</p>
+  </div>
+  <div class="card">
+    <h3>Datos del evento</h3>
+    <div class="form-grid">
+      <label class="f" for="aforoOficial">Asistentes del día (dato organizador)<input type="number" id="aforoOficial" data-k min="0" inputmode="numeric"></label>
+      <label class="f" for="aforoEst">Asistentes del día (tu estimado)<input type="number" id="aforoEst" data-k min="0" inputmode="numeric"></label>
+      <label class="f" for="pctCond">% que son conductores (estimado)<input type="number" id="pctCond" data-k min="0" max="100" inputmode="numeric"></label>
+      <label class="f" for="nStands">Número de stands<input type="number" id="nStands" data-k min="0" inputmode="numeric"></label>
+      <label class="f" for="entrada">Entrada<select id="entrada" data-k><option value="">Sin dato</option><option>Libre</option><option>Pagada</option><option>Con registro previo</option></select></label>
+      <label class="f" for="diasEvento">Días que dura el evento<input type="number" id="diasEvento" data-k min="1" inputmode="numeric"></label>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="eyebrow">Dinámica del evento</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="ev1" data-k><span>Hay actividades que retienen a la gente (charlas, sorteos, shows, test drive).</span></label>
+        <label class="check"><input type="checkbox" id="ev2" data-k><span>El flujo pasa por el stand de Socio Conductor (no queda en un rincón).</span></label>
+        <label class="check"><input type="checkbox" id="ev3" data-k><span>Hay estacionamiento o facilidades para llegar en el propio auto.</span></label>
+        <label class="check"><input type="checkbox" id="ev4" data-k><span>El público llega con intención de negocio (preguntan precios, condiciones).</span></label>
+        <label class="check"><input type="checkbox" id="ev5" data-k><span>Hay zona de comida o descanso donde se puede conversar con calma.</span></label>
+        <label class="check"><input type="checkbox" id="ev6" data-k><span>El organizador difunde el evento en gremios, bases de taxi o grupos de WhatsApp.</span></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Perfil del público</div>
+      <label class="f" for="publico">¿Quiénes llegan? ¿Solos, en grupo, con familia? ¿Edad aproximada?<textarea id="publico" data-k placeholder="Mayoría hombres de 35 a 55, llegan en grupos de 2 o 3 de la misma base de taxi…"></textarea></label>
+      <label class="f" for="notasEvento">Ambiente y dinámica general<textarea id="notasEvento" data-k placeholder="Cómo se siente el evento, qué genera movimiento, qué momentos se llenan…"></textarea></label>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Competencia y otros captadores de conductores</h3>
+    <div class="form-grid">
+      <label class="f" for="cp_nombre">Marca<input type="text" id="cp_nombre" placeholder="App, financiera, aseguradora…"></label>
+      <label class="f" for="cp_oferta">Qué ofrece<input type="text" id="cp_oferta" placeholder="Menor comisión, crédito vehicular…"></label>
+      <label class="f" for="cp_gancho">Gancho para atraer<input type="text" id="cp_gancho" placeholder="Ruleta, regalo, lavado gratis…"></label>
+      <label class="f" for="cp_afl">Afluencia
+        <select id="cp_afl"><option value="1">1 · Vacío</option><option value="2">2 · Poca</option><option value="3" selected>3 · Normal</option><option value="4">4 · Llena</option><option value="5">5 · Con cola</option></select></label>
+    </div>
+    <div class="row"><button class="btn" id="cp_add" type="button">Agregar marca</button></div>
+    <div class="entries" id="cp-list"></div>
+  </div>
+</section>
+
+<!-- REPLICAR -->
+<section class="panel" role="tabpanel" id="p-replicar" aria-labelledby="tab-replicar" hidden>
+  <div class="block">
+    <h2>¿Lo replicamos con nuestra empresa?</h2>
+    <p class="lead">Un evento con mucho movimiento no siempre conviene. Puntúa cada criterio de 1 a 5; el peso refleja cuánto importa para una empresa del sector automotriz que busca conductores.</p>
+  </div>
+  <div class="card">
+    <div class="score">
+      <div class="score-num num" id="score-num">–<small>/100</small></div>
+      <div class="block">
+        <div id="score-verdict"><span class="pill neutral">Sin puntuar</span></div>
+        <div class="meter" aria-hidden="true"><i id="score-bar" style="width:0%"></i><span class="mark" style="left:55%"></span><span class="mark" style="left:75%"></span></div>
+        <p class="muted" style="font-size:.86rem">Menos de 55: no replicar tal cual · 55 a 74: replicar con ajustes · 75 o más: replicar como piloto.</p>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="rates-rep"></div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Costo por registro</h3>
+      <div class="form-grid">
+        <label class="f" for="costoStand">Costo del stand (S/)<input type="number" id="costoStand" data-k min="0" inputmode="numeric"></label>
+        <label class="f" for="costoPersonal">Personal y material (S/)<input type="number" id="costoPersonal" data-k min="0" inputmode="numeric"></label>
+        <label class="f" for="regStand">Registros del día (dato del stand)<input type="number" id="regStand" data-k min="0" inputmode="numeric"></label>
+      </div>
+      <div class="kpis" id="cpl-kpis"></div>
+      <p class="muted" style="font-size:.86rem">Si el stand no te da su número, se usa tu conteo de registros extrapolado. Compáralo con lo que hoy nos cuesta captar un conductor por redes o referidos.</p>
+    </div>
+    <div class="card">
+      <h3>Si lo replicamos, qué haríamos distinto</h3>
+      <label class="f" for="mejoras"><span class="muted">Ideas concretas: ubicación, gancho, guion, registro, seguimiento.</span><textarea id="mejoras" data-k placeholder="Registro en 30 s por QR, promotores en el pasillo, beneficio visible desde 10 m…"></textarea></label>
+    </div>
+  </div>
+</section>
+
+<!-- INSIGHTS -->
+<section class="panel" role="tabpanel" id="p-insights" aria-labelledby="tab-insights" hidden>
+  <div class="block">
+    <h2>Insights: qué buscar y qué no dejar pasar</h2>
+    <p class="lead">Un insight no es un dato. Es una observación que explica un comportamiento y lleva a una acción. Usa la fórmula: <b>vi esto → pasa por esto → deberíamos hacer esto</b>.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="eyebrow">Hipótesis para validar en el día</div>
+      <div class="insight"><h3>El conductor decide por plata, no por marca</h3><p class="muted">Si el pitch que convierte habla de ganancias, comisión o bonos, nuestro mensaje en cualquier evento debe abrir con un número.</p></div>
+      <div class="insight"><h3>La mayoría llega en grupo desde su base o paradero</h3><p class="muted">Si se confirma, el canal no es el evento sino el líder de la base. Un evento sirve para conocerlos y activar referidos.</p></div>
+      <div class="insight"><h3>El registro largo mata la conversión</h3><p class="muted">Si muchos conversan pero pocos se registran, el problema está en el paso final: formulario, requisitos o falta de incentivo inmediato.</p></div>
+      <div class="insight"><h3>El gancho atrae curiosos, no conductores</h3><p class="muted">Un sorteo llena el stand, pero mira quién se queda. Mide qué parte del público del gancho sí maneja.</p></div>
+      <div class="insight"><h3>La tarde rinde distinto a la mañana</h3><p class="muted">Los conductores trabajan en horas punta. Si el pico del evento es a mediodía, eso dice cuándo programar nuestras activaciones.</p></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Puntos ciegos que suelen fallar</div>
+      <div class="risk"><span class="pill bad">Alto</span><p><b>Confundir tráfico con resultado.</b> Mucha gente en el stand no significa registros. Reporta siempre el embudo completo.</p></div>
+      <div class="risk"><span class="pill bad">Alto</span><p><b>Sesgo de quién te habla.</b> Si solo conversas con los que se acercan al stand, escuchas a los ya interesados. Busca también a los que pasan de largo.</p></div>
+      <div class="risk"><span class="pill bad">Alto</span><p><b>No preguntar el después.</b> Un registro vale si se activa. Pregunta al stand cómo hacen el seguimiento y en cuántos días.</p></div>
+      <div class="risk"><span class="pill warn">Medio</span><p><b>Olvidar el costo.</b> Sin costo del stand y del personal no hay forma de decir si conviene replicar.</p></div>
+      <div class="risk"><span class="pill warn">Medio</span><p><b>Sacar conclusiones solo del día 1.</b> Presenta los números como línea base y di qué medirías los otros días.</p></div>
+      <div class="risk"><span class="pill warn">Medio</span><p><b>No tener evidencia.</b> Sin fotos, videos ni frases textuales, el reporte queda como opinión.</p></div>
+      <div class="risk"><span class="pill neutral">Bajo</span><p><b>Cuidar la relación.</b> Socio Conductor es el anfitrión. Observa con respeto y no compartas datos de nuestra empresa.</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="eyebrow">Preguntas que un senior haría al volver</div>
+    <ul class="list">
+      <li>¿Cuál fue el momento en que el stand más convirtió y qué estaba pasando?</li>
+      <li>¿Qué objeción escuchaste más de una vez?</li>
+      <li>¿Qué hizo la competencia que nosotros no haríamos nunca y qué deberíamos copiar mañana?</li>
+      <li>¿El evento nos trae conductores que no podemos alcanzar por otro canal?</li>
+      <li>¿Qué experimento pequeño podríamos probar en el próximo evento para validar la idea?</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Tus insights del día</h3>
+    <label class="f" for="misInsights"><span class="muted">Escribe al menos 3 con la fórmula: vi esto → pasa por esto → deberíamos hacer esto.</span><textarea id="misInsights" data-k style="min-height:160px" placeholder="Vi que los promotores que salían al pasillo registraban el doble → el conductor no se acerca solo → en nuestro stand, 2 personas siempre fuera de la mesa."></textarea></label>
+  </div>
+</section>
+
+<!-- REPORTE -->
+<section class="panel" role="tabpanel" id="p-reporte" aria-labelledby="tab-reporte" hidden>
+  <div class="block">
+    <h2>Reporte para tu jefe</h2>
+    <p class="lead">Se arma con lo que registraste en las otras pestañas. Cópialo, revísalo y agrega tus fotos al enviarlo.</p>
+  </div>
+  <div class="row">
+    <button class="btn yellow" id="copyReport" type="button">Copiar reporte</button>
+    <button class="btn ghost" id="copyBackup" type="button">Copiar respaldo de datos</button>
+    <span class="toast" id="copyToast" aria-live="polite"></span>
+  </div>
+  <pre class="report" id="report" tabindex="0"></pre>
+  <div class="card">
+    <h3>Borrar datos</h3>
+    <p class="muted">Los datos viven solo en este navegador. Copia el respaldo antes de borrar o de cambiar de celular.</p>
+    <div class="row" id="resetArea"><button class="btn danger" id="resetBtn" type="button">Borrar todo</button></div>
+  </div>
+</section>
+
+</div>
+</main>
+<footer><div class="wrap"><p class="muted" style="font-size:.84rem">Guía de campo · Equipo de Innovación y Estrategia</p></div></footer>
+
+<script>
+(function(){
+const KEY='expotaxi-dia1-v1';
+let S={log:[],f:{},r:{},iv:[],cp:[]};
+try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);S=Object.assign(S,d);}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- Tabs ---------- */
+const tabs=[...document.querySelectorAll('.tab')];
+function show(name,focus){
+  if(!$('p-'+name)) name='mision';
+  tabs.forEach(t=>{const on=t.dataset.tab===name;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;$('p-'+t.dataset.tab).hidden=!on;if(on&&focus)t.focus();if(on)t.scrollIntoView({block:'nearest',inline:'nearest'});});
+  try{history.replaceState(null,'','#'+name);}catch(e){}
+  try{localStorage.setItem(KEY+'-tab',name);}catch(e){}
+  if(name==='reporte') renderReport();
+  window.scrollTo({top:0});
+}
+tabs.forEach((t,i)=>{
+  t.addEventListener('click',()=>show(t.dataset.tab));
+  t.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const n=(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;show(tabs[n].dataset.tab,true);}
+  });
+});
+let start=(location.hash||'').slice(1);
+if(!start){try{start=localStorage.getItem(KEY+'-tab')||'';}catch(e){}}
+show(start||'mision');
+
+/* ---------- Saved fields ---------- */
+document.querySelectorAll('[data-k]').forEach(el=>{
+  const k=el.id;
+  if(k in S.f){ if(el.type==='checkbox') el.checked=!!S.f[k]; else el.value=S.f[k]; }
+  el.addEventListener(el.type==='checkbox'||el.tagName==='SELECT'?'change':'input',()=>{
+    S.f[k]=el.type==='checkbox'?el.checked:el.value; save(); renderAll();
+  });
+});
+const fnum=k=>{const v=parseFloat(S.f[k]);return isFinite(v)?v:null;};
+
+/* ---------- Ratings ---------- */
+const RATES={
+  stand:[
+    ['st_vis','Visibilidad','Se lee “Socio Conductor” desde 10 m o más.'],
+    ['st_ubi','Ubicación','Está en un pasillo con flujo, cerca de entrada, comida o escenario.'],
+    ['st_msg','Mensaje en 5 segundos','Se entiende qué ofrece y qué gana el conductor.'],
+    ['st_mat','Material','Banners, volantes, QR, merchandising útil.'],
+    ['st_gan','Gancho','Sorteo, regalo, dinámica o algo que haga detenerse.']
+  ],
+  prom:[
+    ['pr_pro','Proactividad','Salen al pasillo y abordan, no esperan detrás de la mesa.'],
+    ['pr_gui','Guion claro','El pitch es corto y habla en términos del conductor.'],
+    ['pr_con','Conocimiento','Responden dudas de pagos, requisitos y condiciones.'],
+    ['pr_ene','Energía sostenida','No están en el celular ni sentados; se mantiene en la tarde.'],
+    ['pr_ima','Imagen','Uniforme o elemento que los identifica a distancia.'],
+    ['pr_cie','Cierre','Piden datos, registran y dejan un siguiente paso claro.']
+  ],
+  rep:[
+    ['rp_pub','Público objetivo real','Qué parte de los asistentes son conductores activos.',25],
+    ['rp_cal','Calidad de interacción','Conversaciones con intención real, registros útiles.',20],
+    ['rp_vol','Volumen de tráfico','Cantidad de gente que pasa y se detiene.',15],
+    ['rp_cos','Costo razonable','Stand y personal frente a registros obtenidos.',15],
+    ['rp_fit','Encaje con nuestra marca','El público y el tono del evento calzan con nuestra propuesta.',10],
+    ['rp_ope','Capacidad operativa','Tenemos gente, material y tiempo para hacerlo bien.',10],
+    ['rp_med','Medible','Podemos seguir el registro hasta la activación del conductor.',5]
+  ]
+};
+function rateRow(key,title,help,w){
+  const cur=S.r[key]||0;
+  let b='';for(let i=1;i<=5;i++)b+=`<button type="button" data-rk="${key}" data-v="${i}" aria-pressed="${cur===i}" aria-label="${esc(title)}: ${i}">${i}</button>`;
+  return `<div class="rate-row"><div><b>${esc(title)}</b>${w?` <span class="w">peso ${w}%</span>`:''}<small>${esc(help)}</small></div><div class="rate" role="group" aria-label="${esc(title)}">${b}</div></div>`;
+}
+function buildRates(){
+  $('rates-stand').innerHTML=RATES.stand.map(r=>rateRow(r[0],r[1],r[2])).join('');
+  $('rates-prom').innerHTML=RATES.prom.map(r=>rateRow(r[0],r[1],r[2])).join('');
+  $('rates-rep').innerHTML='<h3>Matriz de decisión</h3>'+RATES.rep.map(r=>rateRow(r[0],r[1],r[2],r[3])).join('');
+}
+buildRates();
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-rk]');if(!b)return;
+  const k=b.dataset.rk,v=+b.dataset.v;
+  S.r[k]=S.r[k]===v?0:v;save();
+  b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.v===S.r[k]));
+  renderAll();
+});
+function avg(list){const v=list.map(r=>S.r[r[0]]).filter(Boolean);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;}
+function repScore(){
+  let tot=0,wsum=0;RATES.rep.forEach(r=>{const v=S.r[r[0]];if(v){tot+=(v/5)*r[3];wsum+=r[3];}});
+  return wsum?{score:Math.round(tot/wsum*100),complete:wsum===100}:null;
+}
+
+/* ---------- Counter ---------- */
+const FUN=[
+  ['pasan','Pasan frente al stand','Conductores que caminan por el pasillo del stand.'],
+  ['paran','Se detienen o miran','Frenan el paso o miran el stand 5 segundos o más.'],
+  ['conversan','Conversan con un promotor','Intercambio real, no solo recibir un volante.'],
+  ['registran','Se registran o dejan datos','Completan el registro o dejan su número.']
+];
+const EXTRA=[
+  ['conocian','Ya conocían Socio Conductor','Lo mencionan o llegan buscándolo.'],
+  ['vuelven','Vuelven al stand','Segunda visita en el día: señal de recurrencia.'],
+  ['abordajes','Abordajes en pasillo','Veces que un promotor sale a buscar a alguien.']
+];
+function cnt(m){return S.log.reduce((a,x)=>a+(x.m===m?1:0),0);}
+function counterHTML(d,funnel){
+  return `<div class="counter${funnel?' funnel-step':''}"><div><div class="c-label">${esc(d[1])}</div><div class="c-help">${esc(d[2])}</div></div><div></div><div class="c-foot"><span class="c-val" id="v-${d[0]}">0</span><button type="button" class="minus" data-dec="${d[0]}" aria-label="Restar uno a ${esc(d[1])}">−</button><button type="button" class="plus" data-inc="${d[0]}" aria-label="Sumar uno a ${esc(d[1])}">+</button></div></div>`;
+}
+$('counters-funnel').innerHTML=FUN.map(d=>counterHTML(d,true)).join('');
+$('counters-extra').innerHTML=EXTRA.map(d=>counterHTML(d,false)).join('');
+document.addEventListener('click',e=>{
+  const inc=e.target.closest('[data-inc]'),dec=e.target.closest('[data-dec]');
+  if(inc){S.log.push({m:inc.dataset.inc,t:Date.now()});save();renderAll();}
+  if(dec){const m=dec.dataset.dec;for(let i=S.log.length-1;i>=0;i--){if(S.log[i].m===m){S.log.splice(i,1);break;}}save();renderAll();}
+});
+function pct(a,b){return b?Math.round(a/b*100)+'%':'–';}
+function factor(){const m=fnum('minHora');return m&&m>0&&m<=60?60/m:6;}
+function hourly(){
+  const h={};S.log.forEach(x=>{const hr=new Date(x.t).getHours();h[hr]=h[hr]||{};h[hr][x.m]=(h[hr][x.m]||0)+1;});
+  return Object.keys(h).map(Number).sort((a,b)=>a-b).map(k=>({h:k,d:h[k]}));
+}
+function peakHour(){const H=hourly();let best=null;H.forEach(r=>{const v=r.d.pasan||0;if(v>0&&(!best||v>(best.d.pasan||0)))best=r;});return best;}
+const hh=h=>String(h).padStart(2,'0')+':00';
+
+function renderCounter(){
+  [...FUN,...EXTRA].forEach(d=>{$('v-'+d[0]).textContent=cnt(d[0]);});
+  $('badge-count').textContent=cnt('pasan');
+  const base=cnt('pasan');
+  let html='';
+  if(!S.log.length) html+='<p class="muted" style="font-size:.9rem">Aún no hay conteos. Toca + en las tarjetas de arriba y aquí verás el embudo.</p>';
+  const max=Math.max(1,...FUN.map(d=>cnt(d[0])));
+  FUN.forEach((d,i)=>{
+    const v=cnt(d[0]);
+    html+=`<div class="f-row"><div class="f-name">${esc(d[1])}</div><div class="f-track" title="${esc(d[1])}: ${v}"><div class="f-bar" style="width:${v/max*100}%"></div></div><div class="f-val">${v}</div>${i>0?`<div class="f-conv">${pct(v,cnt(FUN[i-1][0]))} del paso anterior · ${pct(v,base)} del total</div>`:''}</div>`;
+  });
+  $('funnel').innerHTML=html;
+  const f=factor(),pk=peakHour(),H=hourly();
+  const regEstHora=H.length?Math.round(cnt('registran')*f/H.length):0;
+  $('count-kpis').innerHTML=`
+    <div class="kpi"><b>${pk?hh(pk.h):'–'}</b><span>Hora pico (pasan)</span></div>
+    <div class="kpi"><b>${pct(cnt('registran'),base)}</b><span>Registro sobre los que pasan</span></div>
+    <div class="kpi"><b>${pct(cnt('conocian'),cnt('conversan'))}</b><span>Ya conocían, sobre los que conversan</span></div>
+    <div class="kpi"><b>${H.length?regEstHora:'–'}</b><span>Registros estimados por hora</span></div>`;
+  // hourly table
+  if(!H.length){$('hourly').innerHTML='<tbody><tr><td class="muted">El desglose aparece cuando empieces a contar.</td></tr></tbody>';return;}
+  const maxP=Math.max(1,...H.map(r=>r.d.pasan||0));
+  let t='<thead><tr><th>Hora</th><th>Pasan</th>'+['Se detienen','Conversan','Registran'].map(x=>`<th>${x}</th>`).join('')+'<th>Conocían</th><th>Vuelven</th><th>Pasan / hora est.</th></tr></thead><tbody>';
+  H.forEach(r=>{
+    const p=r.d.pasan||0;
+    t+=`<tr class="${pk&&pk.h===r.h?'peak':''}"><td class="num">${hh(r.h)}</td><td class="n" style="text-align:left"><span class="hbar" style="width:${Math.round(p/maxP*90)}px" title="${p} pasan"></span>${p}</td>`+
+      FUN.slice(1).map(d=>`<td class="n">${r.d[d[0]]||0}</td>`).join('')+`<td class="n">${r.d.conocian||0}</td><td class="n">${r.d.vuelven||0}</td><td class="n">${Math.round(p*f)}</td></tr>`;
+  });
+  $('hourly').innerHTML=t+'</tbody>';
+}
+
+/* ---------- Interviews ---------- */
+$('iv_add').addEventListener('click',()=>{
+  const g=id=>$(id).value.trim();
+  S.iv.push({t:Date.now(),perfil:g('iv_perfil'),auto:g('iv_auto'),conocia:g('iv_conocia'),reg:g('iv_reg'),vuelve:g('iv_vuelve'),dolor:g('iv_dolor'),quote:g('iv_quote')});
+  $('iv_dolor').value='';$('iv_quote').value='';save();renderAll();
+  $('iv_toast').textContent='Conversación '+S.iv.length+' guardada';setTimeout(()=>$('iv_toast').textContent='',2500);
+});
+function yesPill(v){return v==='Sí'?'good':v==='No'?'bad':'warn';}
+function renderIV(){
+  const n=S.iv.length;$('badge-iv').textContent=n;
+  const share=(k,v)=>n?Math.round(S.iv.filter(x=>x[k]===v).length/n*100)+'%':'–';
+  $('iv-kpis').innerHTML=`<div class="kpi"><b>${n}<small class="muted" style="font-size:.9rem"> / 15</small></b><span>Conversaciones (meta 10 a 15)</span></div>
+    <div class="kpi"><b>${share('conocia','Sí')}</b><span>Ya conocían Socio Conductor</span></div>
+    <div class="kpi"><b>${share('reg','Sí')}</b><span>Se registraron</span></div>
+    <div class="kpi"><b>${share('vuelve','Sí')}</b><span>Dicen que volverán</span></div>`;
+  $('iv-list').innerHTML=n?S.iv.map((x,i)=>`<div class="entry"><div class="block" style="gap:6px"><div class="tags"><span class="pill neutral">#${i+1} · ${esc(x.perfil)}</span><span class="pill neutral">${esc(x.auto)}</span><span class="pill ${yesPill(x.conocia)}">Conocía: ${esc(x.conocia)}</span><span class="pill ${yesPill(x.reg)}">Registro: ${esc(x.reg)}</span><span class="pill ${yesPill(x.vuelve)}">Vuelve: ${esc(x.vuelve)}</span></div>${x.dolor?`<div><b>Problema:</b> ${esc(x.dolor)}</div>`:''}${x.quote?`<q>${esc(x.quote)}</q>`:''}</div><button class="del" type="button" data-deliv="${i}">Quitar</button></div>`).join(''):'<p class="muted">Todavía no guardas conversaciones.</p>';
+}
+document.addEventListener('click',e=>{
+  const d=e.target.closest('[data-deliv]');if(d){S.iv.splice(+d.dataset.deliv,1);save();renderAll();}
+  const c=e.target.closest('[data-delcp]');if(c){S.cp.splice(+c.dataset.delcp,1);save();renderAll();}
+});
+
+/* ---------- Competitors ---------- */
+$('cp_add').addEventListener('click',()=>{
+  const nombre=$('cp_nombre').value.trim();if(!nombre){$('cp_nombre').focus();return;}
+  S.cp.push({nombre,oferta:$('cp_oferta').value.trim(),gancho:$('cp_gancho').value.trim(),afl:+$('cp_afl').value});
+  ['cp_nombre','cp_oferta','cp_gancho'].forEach(id=>$(id).value='');save();renderAll();
+});
+const AFL=['','Vacío','Poca','Normal','Llena','Con cola'];
+function renderCP(){
+  $('cp-list').innerHTML=S.cp.length?S.cp.map((x,i)=>`<div class="entry"><div class="block" style="gap:4px"><div class="tags"><b>${esc(x.nombre)}</b><span class="pill ${x.afl>=4?'warn':'neutral'}">Afluencia: ${AFL[x.afl]}</span></div>${x.oferta?`<div><span class="muted">Ofrece:</span> ${esc(x.oferta)}</div>`:''}${x.gancho?`<div><span class="muted">Gancho:</span> ${esc(x.gancho)}</div>`:''}</div><button class="del" type="button" data-delcp="${i}">Quitar</button></div>`).join(''):'<p class="muted">Agrega cada marca que también esté buscando conductores.</p>';
+}
+
+/* ---------- Scores ---------- */
+function verdict(s){
+  if(s==null) return ['neutral','Sin puntuar'];
+  if(s>=75) return ['good','Replicar como piloto'];
+  if(s>=55) return ['warn','Replicar con ajustes'];
+  return ['bad','No replicar tal cual'];
+}
+function money(v){return 'S/ '+Math.round(v).toLocaleString('es-PE');}
+function cplData(){
+  const cost=(fnum('costoStand')||0)+(fnum('costoPersonal')||0);
+  const H=hourly();
+  const reg=fnum('regStand')!=null?fnum('regStand'):(H.length?Math.round(cnt('registran')*factor()):null);
+  const src=fnum('regStand')!=null?'dato del stand':'conteo extrapolado';
+  return {cost,reg,src,cpl:cost&&reg?cost/reg:null};
+}
+function renderScores(){
+  const a=avg(RATES.stand),b=avg(RATES.prom);
+  $('avg-stand').textContent=a?a.toFixed(1)+' / 5':'–';
+  $('avg-prom').textContent=b?b.toFixed(1)+' / 5':'–';
+  const r=repScore();const [cls,txt]=verdict(r?r.score:null);
+  $('score-num').innerHTML=(r?r.score:'–')+'<small>/100</small>';
+  $('score-bar').style.width=(r?r.score:0)+'%';
+  $('score-verdict').innerHTML=`<span class="pill ${cls}">${txt}</span>${r&&!r.complete?' <span class="pill neutral">Faltan criterios</span>':''}`;
+  const c=cplData();
+  $('cpl-kpis').innerHTML=`<div class="kpi"><b>${c.cost?money(c.cost):'–'}</b><span>Costo total</span></div><div class="kpi"><b>${c.reg!=null?c.reg:'–'}</b><span>Registros (${c.src})</span></div><div class="kpi"><b>${c.cpl?money(c.cpl):'–'}</b><span>Costo por registro</span></div>`;
+}
+
+/* ---------- Report ---------- */
+function renderReport(){
+  const L=[];const f=k=>(S.f[k]||'').toString().trim();
+  const base=cnt('pasan');const pk=peakHour();const H=hourly();
+  L.push('EXPO TAXI · DÍA 1 · Observación del stand Socio Conductor');
+  L.push('Fecha: '+new Date().toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+  L.push('');
+  L.push('1. RESUMEN EN UNA LÍNEA');
+  const r=repScore();
+  L.push('Recomendación: '+verdict(r?r.score:null)[1]+(r?' ('+r.score+'/100)':'')+'.');
+  L.push('');
+  L.push('2. EL EVENTO');
+  L.push('Asistentes del día: '+(f('aforoOficial')||'sin dato oficial')+' (organizador) · '+(f('aforoEst')||'–')+' (mi estimado)');
+  if(f('pctCond')) L.push('Conductores sobre el total: ~'+f('pctCond')+'%');
+  if(f('nStands')) L.push('Stands: '+f('nStands'));
+  if(f('entrada')) L.push('Entrada: '+f('entrada'));
+  if(f('diasEvento')) L.push('Duración: '+f('diasEvento')+' días');
+  if(f('publico')) L.push('Público: '+f('publico'));
+  if(f('notasEvento')) L.push('Dinámica: '+f('notasEvento'));
+  L.push('');
+  L.push('3. EMBUDO DEL STAND (conteo propio, '+(fnum('minHora')||10)+' min por hora)');
+  FUN.forEach((d,i)=>{const v=cnt(d[0]);L.push('- '+d[1]+': '+v+(i>0?' ('+pct(v,cnt(FUN[i-1][0]))+' del paso anterior)':''));});
+  L.push('Registro sobre los que pasan: '+pct(cnt('registran'),base));
+  L.push('Hora pico: '+(pk?hh(pk.h)+' ('+Math.round((pk.d.pasan||0)*factor())+' pasan por hora, estimado)':'sin datos'));
+  if(H.length) L.push('Horas contadas: '+H.map(x=>hh(x.h)).join(', '));
+  L.push('');
+  L.push('4. RECURRENCIA');
+  L.push('- Ya conocían Socio Conductor: '+cnt('conocian')+' ('+pct(cnt('conocian'),cnt('conversan'))+' de los que conversan)');
+  L.push('- Volvieron al stand en el día: '+cnt('vuelven'));
+  const n=S.iv.length;
+  if(n) L.push('- En entrevistas, dicen que volverán a la expo: '+Math.round(S.iv.filter(x=>x.vuelve==='Sí').length/n*100)+'%');
+  L.push('');
+  L.push('5. STAND Y PROMOTORES');
+  const a=avg(RATES.stand),b=avg(RATES.prom);
+  L.push('Stand: '+(a?a.toFixed(1)+'/5':'sin calificar')+' · Promotores: '+(b?b.toFixed(1)+'/5':'sin calificar')+(f('nProm')?' · '+f('nProm')+' promotores':''));
+  const weak=[...RATES.stand,...RATES.prom].filter(x=>S.r[x[0]]&&S.r[x[0]]<=2).map(x=>x[1]);
+  const strong=[...RATES.stand,...RATES.prom].filter(x=>S.r[x[0]]>=4).map(x=>x[1]);
+  if(strong.length) L.push('Fortalezas: '+strong.join(', '));
+  if(weak.length) L.push('Debilidades: '+weak.join(', '));
+  L.push('Abordajes en pasillo contados: '+cnt('abordajes'));
+  if(f('tAbordaje')||f('tPitch')) L.push('Visita incógnita: me abordaron en '+(f('tAbordaje')||'?')+' s, pitch de '+(f('tPitch')||'?')+' min'+(f('regPide')?', piden: '+f('regPide'):''));
+  if(f('primeraFrase')) L.push('Primera frase: "'+f('primeraFrase')+'"');
+  if(f('notasStand')) L.push('Notas: '+f('notasStand'));
+  L.push('');
+  L.push('6. VOZ DEL CONDUCTOR ('+n+' conversaciones)');
+  if(n){
+    const cntBy=k=>{const o={};S.iv.forEach(x=>o[x[k]]=(o[x[k]]||0)+1);return Object.entries(o).sort((p,q)=>q[1]-p[1]).map(e=>e[0]+' '+e[1]).join(', ');};
+    L.push('Perfil: '+cntBy('perfil'));
+    L.push('Vehículo: '+cntBy('auto'));
+    L.push('Conocían: '+Math.round(S.iv.filter(x=>x.conocia==='Sí').length/n*100)+'% · Se registraron: '+Math.round(S.iv.filter(x=>x.reg==='Sí').length/n*100)+'%');
+    const dol=S.iv.map(x=>x.dolor).filter(Boolean);if(dol.length) L.push('Problemas mencionados: '+dol.join('; '));
+    S.iv.filter(x=>x.quote).slice(0,5).forEach(x=>L.push('  "'+x.quote+'" ('+x.perfil+')'));
+  } else L.push('Sin conversaciones registradas.');
+  L.push('');
+  L.push('7. COMPETENCIA');
+  if(S.cp.length) S.cp.forEach(x=>L.push('- '+x.nombre+' · afluencia '+AFL[x.afl]+(x.oferta?' · ofrece: '+x.oferta:'')+(x.gancho?' · gancho: '+x.gancho:'')));
+  else L.push('Sin registrar.');
+  L.push('');
+  L.push('8. ¿LO REPLICAMOS?');
+  RATES.rep.forEach(x=>L.push('- '+x[1]+' ('+x[3]+'%): '+(S.r[x[0]]?S.r[x[0]]+'/5':'–')));
+  const c=cplData();
+  L.push('Costo por registro: '+(c.cpl?money(c.cpl)+' ('+money(c.cost)+' / '+c.reg+' registros, '+c.src+')':'sin datos de costo'));
+  if(f('mejoras')) L.push('Qué haríamos distinto: '+f('mejoras'));
+  L.push('');
+  L.push('9. INSIGHTS');
+  L.push(f('misInsights')||'Pendiente.');
+  L.push('');
+  L.push('10. PRÓXIMOS PASOS');
+  L.push('- Comparar estos números con los días siguientes (el día 1 es línea base).');
+  L.push('- Pedir a Socio Conductor cuántos registros del evento se activan en 7 y 30 días.');
+  L.push('- Definir si hacemos un piloto y con qué meta de costo por registro.');
+  $('report').textContent=L.join('\n');
+}
+function copyText(text,msg){
+  const done=()=>{$('copyToast').textContent=msg;setTimeout(()=>$('copyToast').textContent='',2500);};
+  const fallback=()=>{const r=document.createRange();r.selectNodeContents($('report'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('copyToast').textContent='Texto seleccionado: cópialo con el menú del sistema';};
+  try{navigator.clipboard.writeText(text).then(done,fallback);}catch(e){fallback();}
+}
+$('copyReport').addEventListener('click',()=>{renderReport();copyText($('report').textContent,'Reporte copiado');});
+$('copyBackup').addEventListener('click',()=>{copyText(JSON.stringify(S),'Respaldo copiado');});
+$('resetArea').addEventListener('click',e=>{
+  if(e.target.id==='resetBtn'){$('resetArea').innerHTML='<div class="confirm"><span>¿Borrar conteos, notas y conversaciones? No se puede deshacer.</span><button class="btn danger" id="resetYes" type="button">Sí, borrar</button><button class="btn ghost" id="resetNo" type="button">Cancelar</button></div>';}
+  if(e.target.id==='resetNo'){$('resetArea').innerHTML='<button class="btn danger" id="resetBtn" type="button">Borrar todo</button>';}
+  if(e.target.id==='resetYes'){S={log:[],f:{},r:{},iv:[],cp:[]};save();
+    document.querySelectorAll('[data-k]').forEach(el=>{if(el.type==='checkbox')el.checked=false;else el.value=el.id==='minHora'?'10':'';});
+    buildRates();$('resetArea').innerHTML='<button class="btn danger" id="resetBtn" type="button">Borrar todo</button>';renderAll();
+    $('copyToast').textContent='Datos borrados';}
+});
+
+function renderAll(){renderCounter();renderIV();renderCP();renderScores();if(!$('p-reporte').hidden)renderReport();}
+renderAll();
+})();
+</script>
