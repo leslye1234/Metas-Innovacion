@@ -1,8 +1,8 @@
 # SDD · Activación Socio Conductor en Expo Taxi
 
 > **Tipo de documento:** Spec-Driven Design (especificación antes de ejecutar)
-> **Fuente:** Reporte de observación Expo Taxi · Día 1 (viernes 25 de setiembre de 2026)
-> **Estado:** Borrador v0.1 · el Día 1 se toma como **línea base**
+> **Fuentes:** Reporte de observación Expo Taxi · Día 1 (viernes 25 de setiembre de 2026) + 2 notas de voz del observador (Día 1)
+> **Estado:** Borrador v0.2 · el Día 1 se toma como **línea base**
 > **Decisión actual:** **Replicar con ajustes** (puntaje 58/100)
 
 ---
@@ -13,7 +13,7 @@ El stand de Socio Conductor en Expo Taxi llega a conductores que **no alcanzamos
 
 Las causas principales que se observaron fueron tres:
 
-1. **Registro con fricción:** se cambió de la app a WhatsApp a mitad del proceso, el conductor sintió que lo "paseaban" y varios se fueron.
+1. **Registro con fricción:** el QR no reconocía el número y se derivaba al conductor a WhatsApp a mitad del proceso. El conductor sintió que lo "paseaban", se demoraba y varios se fueron.
 2. **Promotores con poco dominio del producto** (3.3/5): cierran poco y no transmiten seguridad.
 3. **Stand pasivo y sin dinámica:** poca integración con el público. Cuando llegaron dos promotoras comerciales más, el enganche mejoró.
 
@@ -49,7 +49,15 @@ Esta especificación define **qué cambiar para los Días 2 y 3**, **cómo medir
 
 - Ambiente poco integrador: música de fondo, cada stand por su lado.
 - Promotoras del organizador llamaban a los conductores, pero sin conectar con los stands.
+- Era el día de inauguración y la primera hora tuvo **muy poca gente y poca visibilidad**. Se espera que el flujo suba a medida que avanza el día.
 - El programa oficial empieza a las 14:00. Las observaciones de la mañana **no representan la hora pico del evento**.
+- **Infraestructura:** el recinto no tiene techo. Con calor o lluvia, el evento se ve muy afectado (ver §12).
+
+### 1.4 Difusión digital del evento
+
+- En la búsqueda previa **no se encontró publicidad ni señales de recurrencia** en la página web: pocos seguidores.
+- La cuenta asociada al juego de fútbol tiene algo más de 1,000 seguidores, pero con **muy poca interacción** (likes).
+- **Implicancia:** el evento no trae una comunidad digital propia. El tráfico depende de lo presencial y la recordación de marca tiene que generarla el stand.
 
 ---
 
@@ -87,6 +95,10 @@ Conteo propio: 10 min por hora, en 4 horas (11:00, 12:00, 13:00 y 14:00). Son 40
 
 - **Fortalezas:** visibilidad, ubicación, mensaje entendible en 5 segundos, material, proactividad, energía sostenida, imagen.
 - **Debilidades:** conocimiento del producto y cierre.
+- **Promotor al inicio:** se mostró tímido y pedía apoyo. Le faltaba respaldo para abordar solo.
+- **Promotora freelance:** sabía lo básico, pero su conocimiento era superficial. Le faltaba profundidad para resolver dudas.
+- **Refuerzo en la tarde:** con las dos ayudantes que llegaron en la tarde se espera que suban los registros.
+- **Seguridad:** faltó transmitir seguridad al conductor, sobre todo cuando el registro fallaba.
 
 ### 2.4 Voz del conductor (n = 2, muestra muy pequeña)
 
@@ -104,12 +116,16 @@ Conteo propio: 10 min por hora, en 4 horas (11:00, 12:00, 13:00 y 14:00). Son 40
 | Marca | Afluencia | Qué ofrece | Gancho |
 |---|---|---|---|
 | Mobil | Poca | Aceites | Juego de fútbol |
+| Calia *(confirmar nombre)* | Sin dato | Sin dato | Muchos banners en la **entrada** del evento |
 
 Observaciones generales:
 - Los stands más llamativos tenían **autos en exhibición** y más material publicitario.
 - Varios stands **compraron más espacio**, lo que les da más visibilidad y más cosas que mostrar. El nuestro tenía un solo elemento.
 - Los stands **vacíos** tenían personal **sentado esperando** y no salían a buscar al conductor.
 - Traer autos es parte de la marca de la competencia. **No encaja con Socio Conductor**, así que no lo copiaremos.
+- **Juegos de fútbol:** son el gancho más usado (tiro al arco para ganar premio) y le atraen al público adulto. Valida la dinámica de RF-02.
+- **Banners:** hay muchos y sirven para distinguir cada marca. Calia ocupa la **entrada**, que es el punto de mayor visibilidad: todo el que entra ve su marca primero.
+- **Modelos de autos en exhibición:** además de publicidad, le sirven al conductor para conocer los modelos.
 
 ### 2.6 Costo
 
@@ -167,6 +183,8 @@ Observaciones generales:
   - [ ] Se elige un solo canal antes de abrir el stand.
   - [ ] El registro toma **≤ 2 minutos**.
   - [ ] Hay un QR visible y un respaldo (tablet del promotor) por si el conductor no tiene datos o batería.
+  - [ ] **El QR se prueba antes de abrir** con al menos 3 celulares distintos. En el Día 1 no reconocía el número y obligaba a derivar a otro canal.
+  - [ ] Si el QR falla, el promotor registra al conductor en la tablet en ese mismo momento, sin mandarlo a otro canal.
   - [ ] Ningún promotor deriva a otro canal a mitad del registro.
 
 ### RF-02 · Dinámica con premio condicionada al registro
@@ -186,6 +204,8 @@ Observaciones generales:
   - [ ] Cada promotor responde las preguntas sobre **financiamiento** y **auto alquilado vs. propio**.
   - [ ] Siempre cierra con una invitación explícita a registrarse.
   - [ ] Hay una hoja de preguntas frecuentes impresa en el stand.
+  - [ ] **Los freelance reciben el mismo briefing** que el personal fijo y lo aprueban con un mini quiz de 5 preguntas.
+  - [ ] Nunca hay un promotor solo en el stand durante la primera hora. Siempre tiene apoyo de otro promotor o del líder de stand.
 
 ### RF-04 · Abordaje activo en pasillo
 - **Qué:** al menos un promotor sale al pasillo a invitar a los conductores. Nadie se queda sentado esperando.
@@ -305,6 +325,8 @@ Observaciones generales:
 | T8 | Hacer ≥ 8 entrevistas por día | §9 | Observador | D2 y D3 |
 | T9 | Pedir la tasa de activación a 7 y 30 días | O6 | Analista | +7 y +30 días |
 | T10 | Consolidar los datos de D1, D2 y D3 y recalcular el scorecard | §10 | Analista | Cierre del evento |
+| T11 | Probar el QR de registro en 3 celulares y corregir el reconocimiento del número | RF-01 | Producto / Ops | Antes de abrir el D2 |
+| T12 | Visitar el stand de Calia como benchmark (banners, ubicación, gancho) | §2.5 | Observador | D2 |
 
 ---
 
@@ -318,17 +340,22 @@ Observaciones generales:
 | Promotores sin dominio del producto | Bajo cierre | Briefing, FAQ impresa y supervisión la primera hora |
 | Muestra pequeña (D1) | Conclusiones débiles | Más entrevistas y horas de conteo |
 | Asistencia real menor a la declarada (3,000 vs. 5,000) | Volumen sobreestimado | Usar el estimado propio para proyecciones |
+| Calor o lluvia (el recinto no tiene techo) | Baja asistencia y menos permanencia en el stand | Toldo o sombra propia en el stand; agua para los conductores |
+| El QR no reconoce el número | Abandono del registro | Probar antes de abrir (T11) y tener la tablet de respaldo |
+| Promotor tímido o solo en la primera hora | Pocos abordajes | Siempre en pareja; el líder de stand arranca los primeros abordajes |
 
 ---
 
 ## 13. Hallazgos cualitativos clave (insights)
 
-1. **El refuerzo comercial funciona:** cuando llegaron dos promotoras comerciales más, el conductor se enganchó más.
-2. **La fricción del registro mata la conversión:** pasar de la app a WhatsApp se sintió como "pasear" al conductor y varios se fueron.
+1. **El refuerzo comercial funciona:** al inicio el promotor estaba tímido y pedía apoyo. Cuando llegaron las dos promotoras comerciales, el conductor se enganchó más.
+2. **La fricción del registro mata la conversión:** el QR no reconocía el número, se derivaba a WhatsApp y el conductor se demoraba. Se sintió como "pasearlo" y varios se fueron.
 3. **Canal diferencial:** la expo trae conductores que **no alcanzamos por otros canales**, incluidos los que tienen **auto alquilado**. Por eso vale la pena seguir experimentando.
 4. **Dinámica + registro:** la ruleta o el juego de fútbol deben ir **después** del registro, nunca antes.
-5. **Seguridad y profundidad:** el conductor pide información **concreta y confiable**, no superficial. Esto afecta directamente su decisión.
+5. **Seguridad y profundidad:** el conductor pide información **concreta y confiable**, no superficial. La promotora freelance sabía lo básico, pero no a profundidad. Esto afecta directamente la decisión del conductor.
 6. **No copiar lo que no es marca:** traer autos le funciona a la competencia, pero no encaja con Socio Conductor.
+7. **La entrada es el mejor espacio:** Calia se posiciona con banners en la entrada del evento. Es un punto a evaluar para la próxima edición.
+8. **El evento no tiene comunidad digital:** poca publicidad y baja interacción en redes. La recordación depende del stand.
 
 ---
 
@@ -340,6 +367,9 @@ Observaciones generales:
 - [ ] ¿Cuál es el CPR máximo aceptable frente a otros canales (volanteo, digital)?
 - [ ] ¿Vale la pena comprar más espacio en la próxima edición?
 - [ ] ¿Cómo cambia el tráfico después de las 14:00 (programa oficial)?
+- [ ] ¿"Calia" es el nombre correcto de la marca con banners en la entrada? ¿Qué ofrece y cuánta afluencia tiene?
+- [ ] ¿Cuánto cuesta un espacio o banner en la entrada del evento?
+- [ ] ¿Los pocos seguidores y la baja interacción son de la página del evento o de otra marca? Confirmar la fuente.
 
 ---
 
