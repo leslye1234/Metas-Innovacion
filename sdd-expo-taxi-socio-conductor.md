@@ -55,7 +55,7 @@ Esta especificación define **qué cambiar para los Días 2 y 3**, **cómo medir
 
 ### 1.4 Difusión digital del evento
 
-- En la búsqueda previa **no se encontró publicidad ni señales de recurrencia** en la página web: pocos seguidores.
+- En la búsqueda previa **no se encontró publicidad ni señales de recurrencia** en la página del evento: tiene pocos seguidores.
 - La cuenta asociada al juego de fútbol tiene algo más de 1,000 seguidores, pero con **muy poca interacción** (likes).
 - **Implicancia:** el evento no trae una comunidad digital propia. El tráfico depende de lo presencial y la recordación de marca tiene que generarla el stand.
 
@@ -116,7 +116,7 @@ Conteo propio: 10 min por hora, en 4 horas (11:00, 12:00, 13:00 y 14:00). Son 40
 | Marca | Afluencia | Qué ofrece | Gancho |
 |---|---|---|---|
 | Mobil | Poca | Aceites | Juego de fútbol |
-| Calia *(confirmar nombre)* | Sin dato | Sin dato | Muchos banners en la **entrada** del evento |
+| Calidda | Sin dato | Sin dato | Muchos banners en la **entrada** del evento |
 
 Observaciones generales:
 - Los stands más llamativos tenían **autos en exhibición** y más material publicitario.
@@ -124,7 +124,7 @@ Observaciones generales:
 - Los stands **vacíos** tenían personal **sentado esperando** y no salían a buscar al conductor.
 - Traer autos es parte de la marca de la competencia. **No encaja con Socio Conductor**, así que no lo copiaremos.
 - **Juegos de fútbol:** son el gancho más usado (tiro al arco para ganar premio) y le atraen al público adulto. Valida la dinámica de RF-02.
-- **Banners:** hay muchos y sirven para distinguir cada marca. Calia ocupa la **entrada**, que es el punto de mayor visibilidad: todo el que entra ve su marca primero.
+- **Banners:** hay muchos y sirven para distinguir cada marca. Calidda ocupa la **entrada**, que es el punto de mayor visibilidad: todo el que entra ve su marca primero.
 - **Modelos de autos en exhibición:** además de publicidad, le sirven al conductor para conocer los modelos.
 
 ### 2.6 Costo
@@ -326,7 +326,6 @@ Observaciones generales:
 | T9 | Pedir la tasa de activación a 7 y 30 días | O6 | Analista | +7 y +30 días |
 | T10 | Consolidar los datos de D1, D2 y D3 y recalcular el scorecard | §10 | Analista | Cierre del evento |
 | T11 | Probar el QR de registro en 3 celulares y corregir el reconocimiento del número | RF-01 | Producto / Ops | Antes de abrir el D2 |
-| T12 | Visitar el stand de Calia como benchmark (banners, ubicación, gancho) | §2.5 | Observador | D2 |
 
 ---
 
@@ -354,8 +353,8 @@ Observaciones generales:
 4. **Dinámica + registro:** la ruleta o el juego de fútbol deben ir **después** del registro, nunca antes.
 5. **Seguridad y profundidad:** el conductor pide información **concreta y confiable**, no superficial. La promotora freelance sabía lo básico, pero no a profundidad. Esto afecta directamente la decisión del conductor.
 6. **No copiar lo que no es marca:** traer autos le funciona a la competencia, pero no encaja con Socio Conductor.
-7. **La entrada es el mejor espacio:** Calia se posiciona con banners en la entrada del evento. Es un punto a evaluar para la próxima edición.
-8. **El evento no tiene comunidad digital:** poca publicidad y baja interacción en redes. La recordación depende del stand.
+7. **La entrada es el mejor espacio:** Calidda se posiciona con banners en la entrada del evento. Es un punto a evaluar para la próxima edición.
+8. **El evento no tiene comunidad digital:** la página del evento tiene poca publicidad, pocos seguidores y baja interacción. La recordación depende del stand.
 
 ---
 
@@ -367,9 +366,8 @@ Observaciones generales:
 - [ ] ¿Cuál es el CPR máximo aceptable frente a otros canales (volanteo, digital)?
 - [ ] ¿Vale la pena comprar más espacio en la próxima edición?
 - [ ] ¿Cómo cambia el tráfico después de las 14:00 (programa oficial)?
-- [ ] ¿"Calia" es el nombre correcto de la marca con banners en la entrada? ¿Qué ofrece y cuánta afluencia tiene?
+- [ ] ¿Qué ofrece Calidda en la expo y cuánta afluencia tiene su stand?
 - [ ] ¿Cuánto cuesta un espacio o banner en la entrada del evento?
-- [ ] ¿Los pocos seguidores y la baja interacción son de la página del evento o de otra marca? Confirmar la fuente.
 
 ---
 
