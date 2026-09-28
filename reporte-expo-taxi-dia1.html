@@ -1,0 +1,328 @@
+<title>Expo Taxi · Día 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --ground:#F3F4F6; --paper:#FFFFFF; --ink:#18202C; --ink-2:#4A5463; --ink-3:#7A8392;
+  --rule:#DCE0E6; --amber:#F2B705; --amber-ink:#8A6400; --amber-soft:#FFF4CC;
+  --good:#1E7A4F; --good-soft:#E3F3EA; --bad:#B4372B; --bad-soft:#FBE7E4; --track:#E8EBEF;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#11151C; --paper:#181E27; --ink:#E9EDF2; --ink-2:#B3BCC8; --ink-3:#8791A0;
+    --rule:#2B3440; --amber:#F2B705; --amber-ink:#F5C94A; --amber-soft:#3A3013;
+    --good:#5CC795; --good-soft:#15291F; --bad:#F08A7E; --bad-soft:#35191A; --track:#26303C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#11151C; --paper:#181E27; --ink:#E9EDF2; --ink-2:#B3BCC8; --ink-3:#8791A0;
+  --rule:#2B3440; --amber:#F2B705; --amber-ink:#F5C94A; --amber-soft:#3A3013;
+  --good:#5CC795; --good-soft:#15291F; --bad:#F08A7E; --bad-soft:#35191A; --track:#26303C;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:0 56px}
+.wrap{max-width:880px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h2{font-size:22px;font-weight:750;font-stretch:88%;letter-spacing:.2px}
+h3{font-size:16px;font-weight:700}
+p{margin:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);font-weight:600}
+
+/* checker band, taxi livery */
+.band{height:14px;margin-inline:-16px;background:
+  repeating-conic-gradient(var(--ink) 0 25%, var(--amber) 0 50%) 0 0/14px 14px}
+header{padding-block:28px 24px;display:grid;gap:10px}
+header h1{font-size:clamp(30px,6vw,46px);font-weight:800;font-stretch:80%;letter-spacing:-.3px}
+header .sub{color:var(--ink-2);max-width:62ch}
+
+.verdict{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:22px;display:grid;gap:18px}
+.verdict-top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.pill{display:inline-block;background:var(--amber-soft);color:var(--amber-ink);border:1px solid var(--amber);font-weight:600;border-radius:999px;padding:4px 12px;font-size:13px}
+.score{display:flex;align-items:baseline;gap:6px}
+.score b{font-family:var(--display);font-size:44px;font-weight:800;font-stretch:80%}
+.score span{color:var(--ink-3)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{border-top:3px solid var(--ink);padding-top:8px;display:grid;gap:2px}
+.kpi b{font-family:var(--display);font-size:28px;font-weight:800;font-stretch:85%}
+.kpi small{color:var(--ink-2);font-size:13px;line-height:1.35}
+@media (max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+
+section{padding-block:34px 0;display:grid;gap:16px}
+section > .head{display:flex;gap:12px;align-items:baseline;border-bottom:2px solid var(--ink);padding-bottom:8px}
+section > .head .n{font-family:var(--mono);color:var(--amber-ink);font-size:13px}
+.lead{color:var(--ink-2);max-width:68ch}
+
+.causes{display:grid;gap:10px;counter-reset:c}
+.cause{background:var(--paper);border:1px solid var(--rule);border-left:4px solid var(--bad);border-radius:6px;padding:12px 14px;display:grid;gap:4px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.grid2{grid-template-columns:1fr}}
+.box{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:16px;display:grid;gap:10px;align-content:start}
+
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:600}
+td.r,th.r{text-align:right}
+tr:last-child td{border-bottom:0}
+
+ul.plain{margin:0;padding-left:18px;display:grid;gap:6px}
+ul.plain li::marker{color:var(--amber-ink)}
+
+/* funnel */
+.funnel{display:grid;gap:10px}
+.frow{display:grid;grid-template-columns:170px 1fr 92px;gap:12px;align-items:center}
+.frow .bar{height:26px;background:var(--track);border-radius:4px;overflow:hidden}
+.frow .bar i{display:block;height:100%;background:var(--ink)}
+.frow.last .bar i{background:var(--amber)}
+.frow .v{text-align:right;font-size:13px;color:var(--ink-2)}
+.frow .v b{color:var(--ink);font-size:15px}
+.leak{margin-left:182px;font-size:13px;color:var(--bad);font-weight:600}
+@media (max-width:560px){
+  .frow{grid-template-columns:1fr 80px}
+  .frow .bar{grid-column:1/-1;grid-row:2}
+  .leak{margin-left:0}
+}
+
+/* score bars */
+.sc{display:grid;gap:9px}
+.srow{display:grid;grid-template-columns:minmax(150px,220px) 48px 1fr 40px;gap:12px;align-items:center;font-size:14px}
+.srow .w{color:var(--ink-3);font-size:12.5px}
+.dots{display:flex;gap:4px}
+.dots i{flex:1;height:10px;border-radius:2px;background:var(--track)}
+.dots i.on{background:var(--ink)}
+.dots.low i.on{background:var(--bad)}
+@media (max-width:560px){.srow{grid-template-columns:1fr 40px;row-gap:4px}.srow .w{display:none}.srow .dots{grid-column:1/-1;grid-row:2}}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12.5px;border-radius:4px;padding:2px 8px;border:1px solid var(--rule)}
+.chip.g{background:var(--good-soft);color:var(--good);border-color:transparent}
+.chip.b{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+
+.changes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:700px){.changes{grid-template-columns:1fr}}
+.change{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.change .tag{font-family:var(--mono);font-size:12px;color:var(--amber-ink)}
+.change p{color:var(--ink-2);font-size:14px}
+
+.up{color:var(--good);font-weight:600}
+.quote{border-left:3px solid var(--amber);padding:4px 0 4px 12px;font-style:italic;color:var(--ink-2)}
+
+.ask{background:var(--ink);color:var(--paper);border-radius:10px;padding:20px 22px;display:grid;gap:12px}
+.ask h3{color:var(--amber)}
+.ask ol{margin:0;padding-left:20px;display:grid;gap:8px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ask{background:var(--paper);border:1px solid var(--amber);color:var(--ink)}}
+:root[data-theme="dark"] .ask{background:var(--paper);border:1px solid var(--amber);color:var(--ink)}
+
+footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12.5px}
+</style>
+
+<div class="wrap">
+<div class="band" aria-hidden="true"></div>
+
+<header>
+  <span class="label">Informe de observación · Stand Socio Conductor</span>
+  <h1>Expo Taxi · Día 1</h1>
+  <p class="sub">Viernes 25 de setiembre de 2026. Resultados del primer día (línea base), qué funcionó, qué falló y qué proponemos cambiar para los Días 2 y 3.</p>
+</header>
+
+<div class="verdict">
+  <div class="verdict-top">
+    <div style="display:grid;gap:6px">
+      <span class="label">Recomendación</span>
+      <span class="pill">Replicar con ajustes</span>
+    </div>
+    <div class="score"><b class="num">58</b><span>/ 100 puntos</span></div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b class="num">15%</b><small>de los que pasan por el stand se registran</small></div>
+    <div class="kpi"><b class="num">38%</b><small>de los que conversan se registran (cierre)</small></div>
+    <div class="kpi"><b class="num">S/ 100</b><small>costo por registro</small></div>
+    <div class="kpi"><b class="num">0%</b><small>conocía Socio Conductor antes</small></div>
+  </div>
+  <p class="lead">El stand llega a conductores que no alcanzamos por otros canales y se ve bien. El problema está en el cierre: se pierde el 62% de los que ya conversaron con un promotor.</p>
+</div>
+
+<section>
+  <div class="head"><span class="n">1</span><h2>Por qué no se registró más gente</h2></div>
+  <div class="causes">
+    <div class="cause"><h3>El registro tuvo fricción</h3><p>El QR no reconocía el número y se derivaba al conductor a WhatsApp a mitad del proceso. Se demoraba, sentía que lo "paseaban" y varios se fueron.</p></div>
+    <div class="cause"><h3>Los promotores no cerraron con seguridad</h3><p>Al inicio el promotor estaba tímido y pedía apoyo. La promotora freelance sabía lo básico, pero no a profundidad. Faltó transmitir seguridad, sobre todo cuando el registro fallaba.</p></div>
+    <div class="cause"><h3>El stand fue pasivo y sin dinámica</h3><p>No hubo abordaje en el pasillo ni juego con premio. Cuando llegaron dos promotoras comerciales en la tarde, el enganche mejoró.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">2</span><h2>Embudo del stand</h2></div>
+  <p class="lead">Conteo propio de 10 minutos por hora a las 11:00, 12:00, 13:00 y 14:00 (40 minutos de muestra). Hora pico: 12:00, con unas 174 personas por hora pasando por el stand.</p>
+  <div class="box">
+    <div class="funnel">
+      <div class="frow"><span>Pasan frente al stand</span><div class="bar"><i style="width:100%"></i></div><span class="v"><b class="num">53</b> · 100%</span></div>
+      <div class="frow"><span>Se detienen o miran</span><div class="bar"><i style="width:39.6%"></i></div><span class="v"><b class="num">21</b> · 40%</span></div>
+      <div class="frow"><span>Conversan con un promotor</span><div class="bar"><i style="width:39.6%"></i></div><span class="v"><b class="num">21</b> · 40%</span></div>
+      <div class="frow last"><span>Se registran</span><div class="bar"><i style="width:15.1%"></i></div><span class="v"><b class="num">8</b> · 15%</span></div>
+    </div>
+    <p class="leak">Entre conversar y registrarse se pierde el 62%.</p>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">3</span><h2>El evento</h2></div>
+  <div class="grid2">
+    <div class="box">
+      <div class="tbl-wrap"><table>
+        <tr><td>Asistentes (según organizador)</td><td class="r num">5,000</td></tr>
+        <tr><td>Asistentes (estimado propio)</td><td class="r num">3,000</td></tr>
+        <tr><td>Conductores sobre el total</td><td class="r num">~80%</td></tr>
+        <tr><td>Stands</td><td class="r num">6</td></tr>
+        <tr><td>Duración · entrada</td><td class="r">3 días · libre</td></tr>
+        <tr><td>Programa oficial desde</td><td class="r num">14:00</td></tr>
+      </table></div>
+    </div>
+    <div class="box">
+      <h3>Qué vimos</h3>
+      <ul class="plain">
+        <li>Inauguración con poca gente y poca visibilidad en la primera hora.</li>
+        <li>Ambiente poco integrador: música de fondo y cada stand por su lado.</li>
+        <li>Público: la mayoría conductores solos que vienen a preguntar; algunos en grupo; casi nadie en familia; algunos transeúntes curiosos.</li>
+        <li>El recinto no tiene techo. Con calor o lluvia, el evento se ve muy afectado.</li>
+        <li>La página del evento tiene poca publicidad, pocos seguidores y baja interacción. El evento no trae comunidad digital propia.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">4</span><h2>Stand, promotores y conductores</h2></div>
+  <div class="grid2">
+    <div class="box">
+      <div style="display:flex;gap:28px;flex-wrap:wrap">
+        <div><span class="label">Stand</span><div class="num" style="font-size:24px">4.2 <span style="font-size:14px;color:var(--ink-3)">/ 5</span></div></div>
+        <div><span class="label">Promotores</span><div class="num" style="font-size:24px">3.3 <span style="font-size:14px;color:var(--ink-3)">/ 5</span></div></div>
+        <div><span class="label">Abordajes en pasillo</span><div class="num" style="font-size:24px">0</div></div>
+      </div>
+      <span class="label">Fortalezas</span>
+      <div class="chips"><span class="chip g">Visibilidad</span><span class="chip g">Ubicación</span><span class="chip g">Mensaje en 5 s</span><span class="chip g">Material</span><span class="chip g">Proactividad</span><span class="chip g">Energía</span><span class="chip g">Imagen</span></div>
+      <span class="label">Debilidades</span>
+      <div class="chips"><span class="chip b">Conocimiento del producto</span><span class="chip b">Cierre</span></div>
+    </div>
+    <div class="box">
+      <h3>Voz del conductor</h3>
+      <p class="lead" style="font-size:14px">Solo 2 conversaciones, así que es una muestra muy pequeña.</p>
+      <ul class="plain">
+        <li>Perfil: taxi formal (2). Vehículo: 1 alquilado, 1 propio.</li>
+        <li>Ninguno conocía la marca; se registró 1 de 2.</li>
+        <li>Problema mencionado: financiamiento.</li>
+        <li>Ninguno vino antes ni dijo que volverá a la expo.</li>
+      </ul>
+      <p class="quote">"Grifo en la esquina", conductor de taxi formal.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">5</span><h2>Competencia y otros stands</h2></div>
+  <div class="box">
+    <div class="tbl-wrap"><table>
+      <tr><th>Marca</th><th>Afluencia</th><th>Ofrece</th><th>Gancho</th></tr>
+      <tr><td>Mobil</td><td>Poca</td><td>Aceites</td><td>Juego de fútbol</td></tr>
+      <tr><td>Calidda</td><td>Sin dato</td><td>Sin dato</td><td>Banners en la entrada del evento</td></tr>
+    </table></div>
+    <ul class="plain">
+      <li>Los stands más llamativos tenían autos en exhibición y más material. Varios compraron más espacio; el nuestro tenía un solo elemento.</li>
+      <li>El juego de fútbol es el gancho más usado y le gusta al público adulto.</li>
+      <li>Calidda ocupa la entrada, el punto de mayor visibilidad: todo el que entra ve su marca primero.</li>
+      <li>Los stands vacíos tenían personal sentado esperando.</li>
+      <li>Exhibir autos no encaja con nuestra marca, así que no lo copiaremos.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">6</span><h2>Puntaje: ¿lo replicamos?</h2></div>
+  <div class="box">
+    <div class="sc">
+      <div class="srow"><span>Público objetivo real</span><span class="w num">25%</span><div class="dots low"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div><span class="num">2/5</span></div>
+      <div class="srow"><span>Calidad de interacción</span><span class="w num">20%</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="num">3/5</span></div>
+      <div class="srow"><span>Volumen de tráfico</span><span class="w num">15%</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="num">3/5</span></div>
+      <div class="srow"><span>Costo razonable</span><span class="w num">15%</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="num">3/5</span></div>
+      <div class="srow"><span>Encaje con la marca</span><span class="w num">10%</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><span class="num">4/5</span></div>
+      <div class="srow"><span>Capacidad operativa</span><span class="w num">10%</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="num">3/5</span></div>
+      <div class="srow"><span>Medible</span><span class="w num">5%</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><span class="num">4/5</span></div>
+    </div>
+    <p style="font-size:14px;color:var(--ink-2)">Costo: S/ 20,050 entre 200 registros (dato del stand) = <b class="num" style="color:var(--ink)">S/ 100</b> por registro.</p>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">7</span><h2>Qué cambiamos para los Días 2 y 3</h2></div>
+  <div class="changes">
+    <div class="change"><span class="tag">Registro</span><h3>Un solo canal y QR probado</h3><p>Probar el QR en 3 celulares antes de abrir. Si falla, registrar en la tablet del promotor ahí mismo, sin derivar a WhatsApp. Máximo 2 minutos.</p></div>
+    <div class="change"><span class="tag">Dinámica</span><h3>Primero se registra, después juega</h3><p>Ruleta o juego de fútbol solo para quien completó el registro. Premio para todos y uno mayor para quien gana.</p></div>
+    <div class="change"><span class="tag">Promotores</span><h3>Guion, preguntas frecuentes y cierre</h3><p>Briefing para todos, incluidos los freelance, con respuestas sobre financiamiento y auto alquilado o propio. Nadie solo en la primera hora.</p></div>
+    <div class="change"><span class="tag">Pasillo</span><h3>Salir a buscar al conductor</h3><p>Un promotor siempre en el pasillo invitando, el resto en el stand. Contar los abordajes por hora.</p></div>
+    <div class="change"><span class="tag">Mensaje</span><h3>Adaptar según el conductor</h3><p>Preguntar si el auto es propio o alquilado y si es taxi formal o de aplicativo, y ajustar el mensaje.</p></div>
+    <div class="change"><span class="tag">Ambiente</span><h3>Más animación en hora pico</h3><p>Música y dinámica propias entre 12:00 y 16:00, un banner o pantalla adicional y sombra o agua por el calor.</p></div>
+  </div>
+
+  <div class="box">
+    <h3>Metas propuestas</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Indicador</th><th class="r">Día 1</th><th class="r">Meta D2–D3</th></tr>
+      <tr><td>Registro / conversan (cierre)</td><td class="r num">38%</td><td class="r num up">≥ 60%</td></tr>
+      <tr><td>Registro / pasan</td><td class="r num">15%</td><td class="r num up">≥ 25%</td></tr>
+      <tr><td>Se detienen / pasan</td><td class="r num">40%</td><td class="r num up">≥ 50%</td></tr>
+      <tr><td>Costo por registro</td><td class="r num">S/ 100</td><td class="r num up">≤ S/ 70</td></tr>
+      <tr><td>Abordajes en pasillo y regresos</td><td class="r num">0 / 0</td><td class="r num up">&gt; 0</td></tr>
+      <tr><td>Registros activados a 7 y 30 días</td><td class="r">Sin dato</td><td class="r">Obtener el dato</td></tr>
+    </table></div>
+    <p style="font-size:13px;color:var(--ink-3)">Las metas son una propuesta inicial y se recalibran al cierre del Día 2.</p>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">8</span><h2>Riesgos</h2></div>
+  <div class="box">
+    <div class="tbl-wrap"><table>
+      <tr><th>Riesgo</th><th>Cómo lo cubrimos</th></tr>
+      <tr><td>Gente que se registra solo por el premio y no se activa</td><td>Medir la activación a 7 y 30 días; pedir validar el teléfono para el premio mayor.</td></tr>
+      <tr><td>El QR vuelve a fallar</td><td>Probarlo antes de abrir y tener la tablet de respaldo.</td></tr>
+      <tr><td>Calor o lluvia (no hay techo)</td><td>Toldo o sombra propia y agua para los conductores.</td></tr>
+      <tr><td>Se acaban los premios en la hora pico</td><td>Stock para al menos 30 por hora y reposición a mediodía.</td></tr>
+      <tr><td>La asistencia real es menor a la declarada</td><td>Proyectar con nuestro estimado (3,000), no con el del organizador.</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">9</span><h2>Qué necesito de ti</h2></div>
+  <div class="ask">
+    <h3>Decisiones y datos pendientes</h3>
+    <ol>
+      <li>Aprobar los cambios del punto 7 para los Días 2 y 3, incluido el presupuesto de premios para la dinámica.</li>
+      <li>Pedir a Socio Conductor cuántos registros del evento se activan a 7 y 30 días.</li>
+      <li>Definir el costo por registro máximo que aceptamos frente a otros canales (propuesta: S/ 70).</li>
+      <li>Confirmar de dónde salen los 200 registros del stand: nuestro conteo vio 8 en 40 minutos.</li>
+      <li>Evaluar para la próxima edición un espacio o banner en la entrada, como el de Calidda.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="n">10</span><h2>Próximos pasos</h2></div>
+  <ul class="plain">
+    <li>Medir los Días 2 y 3 con el mismo método, sumando horas de la tarde y al menos 8 entrevistas por día.</li>
+    <li>Comparar contra el Día 1 y recalcular el puntaje al cierre del evento.</li>
+    <li>Con esos datos, decidir si hacemos un piloto formal en la próxima feria y con qué meta de costo por registro.</li>
+  </ul>
+</section>
+
+<footer>Fuentes: reporte de observación del Día 1 y notas de voz del observador. Especificación completa en <span class="num">sdd-expo-taxi-socio-conductor.md</span>.</footer>
+</div>
