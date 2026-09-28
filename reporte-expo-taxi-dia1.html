@@ -121,6 +121,15 @@ ul.plain li::marker{color:var(--amber-ink)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ask{background:var(--paper);border:1px solid var(--amber);color:var(--ink)}}
 :root[data-theme="dark"] .ask{background:var(--paper);border:1px solid var(--amber);color:var(--ink)}
 
+.igroup{display:grid;gap:10px}
+.igroup > .label{color:var(--amber-ink)}
+.ins-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:700px){.ins-list{grid-template-columns:1fr}}
+.ins{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.ins p{color:var(--ink-2);font-size:14px}
+.ins .act{font-size:13.5px;color:var(--ink);border-top:1px dashed var(--rule);padding-top:6px}
+.ins .act b{color:var(--amber-ink);font-weight:600}
+
 footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);color:var(--ink-3);font-size:12.5px}
 </style>
 
@@ -245,8 +254,39 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);color:v
   </div>
 </section>
 
+<section id="insights">
+  <div class="head"><span class="n">6</span><h2>Insights del evento</h2></div>
+  <p class="lead">Todo lo que aprendimos en el Día 1, agrupado por tema, con la acción que proponemos para cada punto.</p>
+
+  <div class="igroup"><span class="label">El conductor</span><div class="ins-list">
+    <div class="ins"><h3>El evento abre un canal nuevo</h3><p>Trae conductores que no alcanzamos por otros canales, incluidos los que tienen auto alquilado. Muchos vienen solos y solo a preguntar.</p><p class="act"><b>Qué hacemos:</b> tratar la expo como un canal propio y medir cuántos de estos registros se activan.</p></div>
+    <div class="ins"><h3>Nadie conocía la marca</h3><p>El 0% de los que conversaron conocía Socio Conductor. El stand tiene que presentar la marca desde cero.</p><p class="act"><b>Qué hacemos:</b> un mensaje claro de 5 segundos y un cierre que explique qué gana el conductor.</p></div>
+    <div class="ins"><h3>El dolor que mencionan es el financiamiento</h3><p>Es el único problema concreto que salió en las entrevistas.</p><p class="act"><b>Qué hacemos:</b> tener lista la respuesta sobre financiamiento en el guion y en las preguntas frecuentes.</p></div>
+  </div></div>
+
+  <div class="igroup"><span class="label">El registro y el equipo</span><div class="ins-list">
+    <div class="ins"><h3>Atraer no es el problema; cerrar sí</h3><p>Todos los que se detuvieron conversaron (100%), pero solo el 38% terminó registrándose.</p><p class="act"><b>Qué hacemos:</b> enfocar el esfuerzo en el cierre, no en conseguir más tráfico.</p></div>
+    <div class="ins"><h3>La fricción del registro espanta</h3><p>El QR no reconocía el número, se derivaba a WhatsApp y el conductor se demoraba. Sintió que lo "paseaban" y varios se fueron.</p><p class="act"><b>Qué hacemos:</b> un solo canal, QR probado antes de abrir y tablet de respaldo.</p></div>
+    <div class="ins"><h3>El conductor pide seguridad y profundidad</h3><p>Quiere información concreta y confiable. La promotora freelance sabía lo básico, pero no a profundidad.</p><p class="act"><b>Qué hacemos:</b> briefing para todos, incluidos los freelance, con un mini quiz.</p></div>
+    <div class="ins"><h3>El refuerzo comercial funciona</h3><p>Al inicio el promotor estaba tímido y pedía apoyo. Con las dos promotoras comerciales de la tarde, el conductor se enganchó más.</p><p class="act"><b>Qué hacemos:</b> nunca dejar a un promotor solo; siempre en pareja desde la primera hora.</p></div>
+  </div></div>
+
+  <div class="igroup"><span class="label">Competencia y espacio</span><div class="ins-list">
+    <div class="ins"><h3>Los stands activos se llenan; los pasivos no</h3><p>Los stands con personal sentado esperando se quedaron vacíos. Nosotros tuvimos 0 abordajes en pasillo.</p><p class="act"><b>Qué hacemos:</b> un promotor siempre en el pasillo invitando.</p></div>
+    <div class="ins"><h3>El juego es el gancho que funciona</h3><p>El juego de fútbol es el más usado y le gusta al público adulto.</p><p class="act"><b>Qué hacemos:</b> ruleta o fútbol, pero solo después de registrarse.</p></div>
+    <div class="ins"><h3>El espacio compra visibilidad</h3><p>Varios stands compraron más espacio y Calidda ocupa la entrada, donde todos ven su marca primero. Nuestro stand tenía un solo elemento.</p><p class="act"><b>Qué hacemos:</b> evaluar para la próxima edición un espacio o banner en la entrada.</p></div>
+    <div class="ins"><h3>No todo lo que funciona es para nosotros</h3><p>Exhibir autos le funciona a la competencia porque es parte de su marca, pero no encaja con Socio Conductor.</p><p class="act"><b>Qué hacemos:</b> no copiarlo y diferenciarnos con la dinámica y el trato.</p></div>
+  </div></div>
+
+  <div class="igroup"><span class="label">El evento</span><div class="ins-list">
+    <div class="ins"><h3>La mañana no es la hora pico</h3><p>La inauguración tuvo poca gente y poca visibilidad. El programa oficial empieza a las 14:00.</p><p class="act"><b>Qué hacemos:</b> contar también en la tarde para no subestimar el tráfico.</p></div>
+    <div class="ins"><h3>El evento no tiene comunidad digital</h3><p>La página del evento tiene poca publicidad, pocos seguidores y baja interacción.</p><p class="act"><b>Qué hacemos:</b> como la recordación depende del stand, darle al conductor algo que se lleve y un siguiente paso claro.</p></div>
+    <div class="ins"><h3>El clima es un riesgo real</h3><p>El recinto no tiene techo. Con calor o lluvia, la gente se queda menos tiempo.</p><p class="act"><b>Qué hacemos:</b> toldo o sombra propia y agua para los conductores.</p></div>
+  </div></div>
+</section>
+
 <section>
-  <div class="head"><span class="n">6</span><h2>Puntaje: ¿lo replicamos?</h2></div>
+  <div class="head"><span class="n">7</span><h2>Puntaje: ¿lo replicamos?</h2></div>
   <div class="box">
     <div class="sc">
       <div class="srow"><span>Público objetivo real</span><span class="w num">25%</span><div class="dots low"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div><span class="num">2/5</span></div>
@@ -262,7 +302,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <div class="head"><span class="n">7</span><h2>Qué cambiamos para los Días 2 y 3</h2></div>
+  <div class="head"><span class="n">8</span><h2>Qué cambiamos para los Días 2 y 3</h2></div>
   <div class="changes">
     <div class="change"><span class="tag">Registro</span><h3>Un solo canal y QR probado</h3><p>Probar el QR en 3 celulares antes de abrir. Si falla, registrar en la tablet del promotor ahí mismo, sin derivar a WhatsApp. Máximo 2 minutos.</p></div>
     <div class="change"><span class="tag">Dinámica</span><h3>Primero se registra, después juega</h3><p>Ruleta o juego de fútbol solo para quien completó el registro. Premio para todos y uno mayor para quien gana.</p></div>
@@ -288,7 +328,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <div class="head"><span class="n">8</span><h2>Riesgos</h2></div>
+  <div class="head"><span class="n">9</span><h2>Riesgos</h2></div>
   <div class="box">
     <div class="tbl-wrap"><table>
       <tr><th>Riesgo</th><th>Cómo lo cubrimos</th></tr>
@@ -302,11 +342,11 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <div class="head"><span class="n">9</span><h2>Qué necesito de ti</h2></div>
+  <div class="head"><span class="n">10</span><h2>Qué necesito de ti</h2></div>
   <div class="ask">
     <h3>Decisiones y datos pendientes</h3>
     <ol>
-      <li>Aprobar los cambios del punto 7 para los Días 2 y 3, incluido el presupuesto de premios para la dinámica.</li>
+      <li>Aprobar los cambios del punto 8 para los Días 2 y 3, incluido el presupuesto de premios para la dinámica.</li>
       <li>Pedir a Socio Conductor cuántos registros del evento se activan a 7 y 30 días.</li>
       <li>Definir el costo por registro máximo que aceptamos frente a otros canales (propuesta: S/ 70).</li>
       <li>Confirmar de dónde salen los 200 registros del stand: nuestro conteo vio 8 en 40 minutos.</li>
@@ -316,7 +356,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);color:v
 </section>
 
 <section>
-  <div class="head"><span class="n">10</span><h2>Próximos pasos</h2></div>
+  <div class="head"><span class="n">11</span><h2>Próximos pasos</h2></div>
   <ul class="plain">
     <li>Medir los Días 2 y 3 con el mismo método, sumando horas de la tarde y al menos 8 entrevistas por día.</li>
     <li>Comparar contra el Día 1 y recalcular el puntaje al cierre del evento.</li>
