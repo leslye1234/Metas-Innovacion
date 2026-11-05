@@ -4,7 +4,8 @@ Orden de uso:
 1. Pega el **Prompt principal** (sección 1) en Lovable.
 2. Cuando Lovable pida conectar Supabase, conéctalo y ejecuta el **SQL** (sección 2) en el SQL Editor.
 3. Pega el **Prompt de datos** (sección 3) para cargar los 30 dolores de ejemplo.
-4. Compara con el boceto en `mockup/priorizacion-dolores.html`.
+4. Adjunta `mockup/logo-calidda.webp` en el chat de Lovable junto al prompt principal.
+5. Compara con el boceto en `mockup/priorizacion-dolores.html`.
 
 ---
 
@@ -14,10 +15,11 @@ Orden de uso:
 Crea una aplicación web en español llamada "Priorización de dolores", con React + TypeScript + Tailwind y Supabase (base de datos + Realtime). Es para que unas 30 personas elijan en tiempo real los dolores más importantes de la compañía.
 
 DISEÑO
-- Fondo celeste claro (#D9EDFA), tarjetas blancas con sombra suave y esquinas redondeadas.
-- Color de acción: celeste oscuro / azul (#1673B5) para botones y casillas.
+- Fondo turquesa corporativo de Cálidda (#32C5DB) en toda la app, tarjetas blancas con sombra suave y esquinas redondeadas.
+- Logo de Cálidda (te lo adjunto como imagen, es blanco con fondo transparente): centrado sobre la tarjeta de acceso y arriba a la izquierda en la pantalla de la aplicación. Guárdalo como asset del proyecto (src/assets/logo-calidda.png).
+- Color de acción: azul petróleo (#0B6E99, hover #07556F) para botones, pestañas activas y casillas. Textos sobre el fondo turquesa en azul muy oscuro (#04252F).
 - Los 8 dolores con más puntos se resaltan en VERDE (#1FA463 con fondo #E1F5EA). Los demás quedan en blanco con borde gris azulado, sin resaltar.
-- Tipografías: "Outfit" para títulos y "Figtree" para texto. Más adelante agregaré el logo.
+- Tipografías: "Outfit" para títulos y "Figtree" para texto. 
 - Debe verse bien en celular y en computadora.
 
 PANTALLA 1: ACCESO (sin registro)
