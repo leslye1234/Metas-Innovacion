@@ -16,7 +16,8 @@ Crea una aplicación web en español llamada "Priorización de dolores", con Rea
 
 DISEÑO
 - Fondo turquesa corporativo de Cálidda (#32C5DB) en toda la app, tarjetas blancas con sombra suave y esquinas redondeadas.
-- Logo de Cálidda (te lo adjunto como imagen, es blanco con fondo transparente): centrado sobre la tarjeta de acceso y arriba a la izquierda en la pantalla de la aplicación. Guárdalo como asset del proyecto (src/assets/logo-calidda.png).
+- Arriba, en lugar del logo, va el título "Sesión de Estrategia" (en blanco y grande sobre la tarjeta de acceso; en pequeño, mayúsculas y azul muy oscuro en la pantalla de la aplicación).
+- El logo de Cálidda (te lo adjunto como imagen, es blanco con fondo transparente) va centrado en la parte INFERIOR de ambas pantallas, a unos 150 px de ancho. Guárdalo como asset del proyecto (src/assets/logo-calidda.png).
 - Color de acción: azul petróleo (#0B6E99, hover #07556F) para botones, pestañas activas y casillas. Textos sobre el fondo turquesa en azul muy oscuro (#04252F).
 - Los 8 dolores con más puntos se resaltan en VERDE (#1FA463 con fondo #E1F5EA). Los demás quedan en blanco con borde gris azulado, sin resaltar.
 - Tipografías: "Outfit" para títulos y "Figtree" para texto. 
