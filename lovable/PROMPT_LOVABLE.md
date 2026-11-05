@@ -38,14 +38,14 @@ Arriba, siempre visible:
 REGLA CLAVE: el ranking NO debe verse ni poder consultarse antes de enviar, para que nadie vote influenciado por los demás. Mientras la persona no ha enviado, solo ve la pantalla de selección (sin pestañas, sin botón de ranking y sin puntos). La tarjeta de participación completada (X de 30) sí puede verse siempre, porque no revela qué dolores van ganando. Esto debe cumplirse también en la base de datos, no solo ocultando botones.
 
 Pantalla de selección (única visible hasta enviar):
-- Lista de todos los dolores (30 de ejemplo, luego serán más). Cada fila muestra número, texto y a la derecha un botón tipo casilla (checklist) cuadrado, celeste oscuro, con check blanco al marcarse.
+- Lista de todos los dolores (30 de ejemplo, luego serán más). Cada fila muestra número, encima del texto el ÁREA a la que pertenece el dolor en letras pequeñas, mayúsculas y color azul petróleo (ej. "OPERACIONES"), el texto del dolor y a la derecha un botón tipo casilla (checklist) cuadrado, celeste oscuro, con check blanco al marcarse.
 - Se pueden marcar como máximo 8. Al llegar a 8, todas las filas NO marcadas quedan bloqueadas (opacidad baja, cursor not-allowed, sin poder hacer clic). Las marcadas siguen activas: si la persona desmarca una, se desbloquean las demás y puede elegir otra.
 - Barra fija abajo con el contador "5 / 8", un mensaje de ayuda ("Te faltan 3 para poder enviar") y el botón "Enviar selección", habilitado solo cuando hay exactamente 8.
 - Al enviar: se guardan los votos, se marca al participante como "completó", se bloquea toda la lista (solo se puede enviar una vez), se muestra el aviso "Tu selección fue enviada" y RECIÉN ENTONCES aparecen las dos pestañas "Mi selección" y "Ranking en vivo", cambiando automáticamente a "Ranking en vivo". Si la persona recarga la página y ya había enviado, entra directo con las pestañas visibles.
 
 Pestaña "Ranking en vivo" (solo existe después de enviar):
 - Lista de TODOS los dolores ordenados de mayor a menor cantidad de puntos. Los puntos son cuántas personas lo marcaron (si 30 lo marcaron, tiene 30; si 15, tiene 15).
-- Cada fila: posición, texto del dolor, una barrita proporcional (puntos / total esperado) y los puntos a la derecha en grande.
+- Cada fila: posición, el área en letras pequeñas arriba del texto del dolor (igual que en la selección), el texto, una barrita proporcional (puntos / total esperado) y los puntos a la derecha en grande.
 - Los 8 primeros llevan el estilo verde. Cuando un dolor sube al top 8, toma el verde; el que sale del top 8 pierde el verde.
 - Cuando cambian los puntos, las filas se reordenan con una animación suave (usar transform translateY con transición, filas de altura fija). El empate se desempata por número de dolor.
 - Se actualiza en tiempo real con Supabase Realtime sin recargar la página: suscríbete a cambios en `votos` y `participantes` y vuelve a calcular.
@@ -68,6 +68,7 @@ Accesibilidad: botones con role="checkbox" y aria-checked, foco visible, contras
 -- Dolores a priorizar
 create table public.dolores (
   id serial primary key,
+  area text not null,
   texto text not null,
   activo boolean not null default true
 );
@@ -100,7 +101,7 @@ insert into public.config default values;
 
 -- Ranking: SOLO lo entrega a quien ya envió su selección (evita el sesgo)
 create or replace function public.obtener_ranking(p_participante uuid)
-returns table (id int, texto text, puntos int, posicion bigint)
+returns table (id int, area text, texto text, puntos int, posicion bigint)
 language plpgsql
 security definer
 set search_path = public
@@ -110,13 +111,13 @@ begin
     raise exception 'El ranking se habilita después de enviar tu selección';
   end if;
   return query
-    select d.id, d.texto, count(v.dolor_id)::int,
+    select d.id, d.area, d.texto, count(v.dolor_id)::int,
            row_number() over (order by count(v.dolor_id) desc, d.id)
     from public.dolores d
     left join public.votos v on v.dolor_id = d.id
     where d.activo
-    group by d.id, d.texto
-    order by 4;
+    group by d.id, d.area, d.texto
+    order by 5;
 end;
 $$;
 
@@ -186,41 +187,41 @@ alter publication supabase_realtime add table public.participantes;
 ## 3. Prompt de datos: los 30 dolores de ejemplo
 
 ```
-Inserta en la tabla `dolores` estos 30 dolores de ejemplo (Fenómeno del Niño en el Perú, desde la mirada de los pobladores). Después los reemplazaré por los reales, así que la app debe leer siempre la lista desde la tabla y no tener textos fijos en el código.
+Inserta en la tabla `dolores` estos 30 dolores de ejemplo, cada uno con su área (Legal, FNB, Experiencia del Cliente, Gestión de personas, Sostenibilidad, Operaciones, Comercial, Seguridad Integral, Finanzas). Después los reemplazaré por los reales, así que la app debe leer siempre la lista y el área desde la tabla y no tener textos fijos en el código. El área puede variar y no todas tienen la misma cantidad de dolores.
 ```
 
 ```sql
-insert into public.dolores (texto) values
-('Pérdida de viviendas por huaicos e inundaciones'),
-('Destrucción de cultivos y pérdida de cosechas'),
-('Carreteras y puentes colapsados que dejan aislados a los centros poblados'),
-('Falta de agua potable segura tras el desborde de ríos'),
-('Brotes de dengue por acumulación de agua estancada'),
-('Pérdida de ganado y animales de crianza'),
-('Pérdida de ingresos y de empleo en el comercio local'),
-('Colegios inundados o dañados que interrumpen las clases'),
-('Centros de salud dañados o inaccesibles'),
-('Alertas tempranas que no llegan a tiempo'),
-('Falta de refugios y albergues adecuados'),
-('Demora en la llegada de la ayuda humanitaria'),
-('Desborde de ríos por falta de defensas ribereñas'),
-('Cortes prolongados de luz y de telecomunicaciones'),
-('Pérdida de documentos de identidad y de propiedad'),
-('Escasa limpieza de quebradas y drenajes antes de la temporada'),
-('Viviendas construidas en zonas de alto riesgo'),
-('Aumento de precios de alimentos y productos básicos'),
-('Enfermedades respiratorias y diarreicas en la población'),
-('Pérdida de embarcaciones y paralización de la pesca artesanal'),
-('Deudas y falta de acceso a créditos para reconstruir'),
-('Demora en la reconstrucción y en la entrega de bonos'),
-('Colapso de desagües y del alcantarillado'),
-('Estrés, ansiedad y afectación emocional de las familias'),
-('Falta de información clara sobre qué hacer en una emergencia'),
-('Falta de maquinaria y equipos para responder rápido'),
-('Riesgo para niños, adultos mayores y personas con discapacidad'),
-('Daño a canales y a la infraestructura de riego'),
-('Acumulación de basura y residuos después del desastre'),
-('Descoordinación entre autoridades locales, regionales y nacionales');
+insert into public.dolores (area, texto) values
+('Legal','Contratos con aprobaciones lentas y de varios pasos'),
+('Legal','Cambios regulatorios que no se comunican a tiempo a las áreas'),
+('Legal','Poco seguimiento a procesos y reclamos legales en curso'),
+('FNB','Baja bancarización de clientes que limita el acceso al financiamiento'),
+('FNB','Demora en la evaluación y aprobación de créditos'),
+('FNB','Cartera morosa con seguimiento tardío'),
+('Experiencia del Cliente','Demoras en la atención de reclamos'),
+('Experiencia del Cliente','Respuestas distintas según el canal de atención'),
+('Experiencia del Cliente','Clientes sin información clara del estado de su solicitud'),
+('Experiencia del Cliente','Facturas confusas que generan consultas repetidas'),
+('Gestión de personas','Alta rotación de personal clave'),
+('Gestión de personas','Falta de planes de desarrollo y línea de carrera'),
+('Gestión de personas','Carga laboral desbalanceada entre equipos'),
+('Sostenibilidad','Impacto ambiental de las obras sin medición consistente'),
+('Sostenibilidad','Poca articulación con las comunidades de las zonas de trabajo'),
+('Sostenibilidad','Indicadores ESG reportados de forma manual y dispersa'),
+('Operaciones','Retrasos en la ejecución de obras'),
+('Operaciones','Falta de integración entre sistemas'),
+('Operaciones','Procesos internos lentos y burocráticos'),
+('Operaciones','Emergencias y fugas atendidas con tiempos altos'),
+('Operaciones','Exceso de reportes manuales'),
+('Comercial','Conexiones nuevas que demoran en concretarse'),
+('Comercial','Falta de seguimiento a prospectos'),
+('Comercial','Metas comerciales poco alineadas con la capacidad operativa'),
+('Seguridad Integral','Daños a la red por terceros durante excavaciones'),
+('Seguridad Integral','Cumplimiento desigual de normas de seguridad en contratistas'),
+('Seguridad Integral','Reporte tardío de incidentes'),
+('Finanzas','Datos poco confiables para decidir'),
+('Finanzas','Cierres contables con muchas tareas manuales'),
+('Finanzas','Presupuestos que se desvían sin alertas tempranas');
 ```
 
 Para cargar los dolores reales más adelante: `delete from public.dolores;` (solo si aún no hay votos) y luego un nuevo `insert`. Si ya hay votos, usa `update public.dolores set activo = false` en los que quieras retirar.
