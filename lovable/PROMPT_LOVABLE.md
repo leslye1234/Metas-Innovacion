@@ -34,13 +34,15 @@ Arriba, siempre visible:
 - Tarjeta "Participación completada": "X de 30 · N%" con barra de progreso. X es la cantidad de participantes que ya enviaron su selección. 30 es el total esperado (constante configurable en la tabla `config`). La barra pasa a verde al llegar a 100%.
 - Debajo de la barra, una línea con la última persona que envió: "María Quispe envió su selección".
 
-Pestaña "Mi selección":
+REGLA CLAVE: el ranking NO debe verse ni poder consultarse antes de enviar, para que nadie vote influenciado por los demás. Mientras la persona no ha enviado, solo ve la pantalla de selección (sin pestañas, sin botón de ranking y sin puntos). La tarjeta de participación completada (X de 30) sí puede verse siempre, porque no revela qué dolores van ganando. Esto debe cumplirse también en la base de datos, no solo ocultando botones.
+
+Pantalla de selección (única visible hasta enviar):
 - Lista de todos los dolores (30 de ejemplo, luego serán más). Cada fila muestra número, texto y a la derecha un botón tipo casilla (checklist) cuadrado, celeste oscuro, con check blanco al marcarse.
 - Se pueden marcar como máximo 8. Al llegar a 8, todas las filas NO marcadas quedan bloqueadas (opacidad baja, cursor not-allowed, sin poder hacer clic). Las marcadas siguen activas: si la persona desmarca una, se desbloquean las demás y puede elegir otra.
 - Barra fija abajo con el contador "5 / 8", un mensaje de ayuda ("Te faltan 3 para poder enviar") y el botón "Enviar selección", habilitado solo cuando hay exactamente 8.
-- Al enviar: se guardan los votos, se marca al participante como "completó", se bloquea toda la lista (solo se puede enviar una vez), se muestra el aviso "Tu selección fue enviada" y se cambia automáticamente a la pestaña "Ranking en vivo".
+- Al enviar: se guardan los votos, se marca al participante como "completó", se bloquea toda la lista (solo se puede enviar una vez), se muestra el aviso "Tu selección fue enviada" y RECIÉN ENTONCES aparecen las dos pestañas "Mi selección" y "Ranking en vivo", cambiando automáticamente a "Ranking en vivo". Si la persona recarga la página y ya había enviado, entra directo con las pestañas visibles.
 
-Pestaña "Ranking en vivo":
+Pestaña "Ranking en vivo" (solo existe después de enviar):
 - Lista de TODOS los dolores ordenados de mayor a menor cantidad de puntos. Los puntos son cuántas personas lo marcaron (si 30 lo marcaron, tiene 30; si 15, tiene 15).
 - Cada fila: posición, texto del dolor, una barrita proporcional (puntos / total esperado) y los puntos a la derecha en grande.
 - Los 8 primeros llevan el estilo verde. Cuando un dolor sube al top 8, toma el verde; el que sale del top 8 pierde el verde.
@@ -49,8 +51,9 @@ Pestaña "Ranking en vivo":
 - Leyenda: verde = "Top 8 priorizados", gris azulado = "Fuera del top 8".
 
 DATOS (Supabase)
-- Usa las tablas del SQL que te voy a pasar: `dolores`, `participantes`, `votos`, `config`, y la vista `ranking_dolores`.
-- El conteo de puntos sale de la vista `ranking_dolores`. Al recibir un evento Realtime, vuelve a pedir la vista.
+- Usa las tablas del SQL que te voy a pasar: `dolores`, `participantes`, `votos`, `config`.
+- NO leas `votos` desde el frontend. El ranking se pide con la función RPC `obtener_ranking(p_participante uuid)`, que solo responde si ese participante ya envió. El avance se pide con `obtener_avance()`.
+- Para el tiempo real, suscríbete a cambios en `participantes` (cada vez que alguien envía cambia su fila) y vuelve a llamar a `obtener_ranking` y `obtener_avance`.
 - El envío debe ser una sola llamada a la función RPC `enviar_seleccion(p_participante uuid, p_dolores int[])`, que valida que sean exactamente 8 dolores distintos y que el participante no haya enviado antes.
 
 Accesibilidad: botones con role="checkbox" y aria-checked, foco visible, contraste suficiente.
@@ -94,17 +97,38 @@ create table public.config (
 );
 insert into public.config default values;
 
--- Ranking: todos los dolores con sus puntos, ordenados
-create or replace view public.ranking_dolores as
-select
-  d.id,
-  d.texto,
-  count(v.dolor_id)::int as puntos,
-  row_number() over (order by count(v.dolor_id) desc, d.id) as posicion
-from public.dolores d
-left join public.votos v on v.dolor_id = d.id
-where d.activo
-group by d.id, d.texto;
+-- Ranking: SOLO lo entrega a quien ya envió su selección (evita el sesgo)
+create or replace function public.obtener_ranking(p_participante uuid)
+returns table (id int, texto text, puntos int, posicion bigint)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (select 1 from public.participantes where participantes.id = p_participante and completo) then
+    raise exception 'El ranking se habilita después de enviar tu selección';
+  end if;
+  return query
+    select d.id, d.texto, count(v.dolor_id)::int,
+           row_number() over (order by count(v.dolor_id) desc, d.id)
+    from public.dolores d
+    left join public.votos v on v.dolor_id = d.id
+    where d.activo
+    group by d.id, d.texto
+    order by 4;
+end;
+$$;
+
+-- Avance general (no revela votos): cuántos completaron y cuántos se esperan
+create or replace function public.obtener_avance()
+returns table (completaron int, total_esperado int)
+language sql
+security definer
+set search_path = public
+as $$
+  select (select count(*) from public.participantes where completo)::int,
+         (select c.total_esperado from public.config c where c.id = 1);
+$$;
 
 -- Envío atómico y validado de la selección
 create or replace function public.enviar_seleccion(p_participante uuid, p_dolores int[])
@@ -134,7 +158,7 @@ begin
 end;
 $$;
 
--- Seguridad (RLS): lectura pública; el envío solo por la función
+-- Seguridad (RLS): los votos solo se leen a través de obtener_ranking
 alter table public.dolores enable row level security;
 alter table public.participantes enable row level security;
 alter table public.votos enable row level security;
@@ -143,13 +167,14 @@ alter table public.config enable row level security;
 create policy "leer dolores" on public.dolores for select using (true);
 create policy "leer participantes" on public.participantes for select using (true);
 create policy "crear participante" on public.participantes for insert with check (completo = false);
-create policy "leer votos" on public.votos for select using (true);
+-- votos: sin política de lectura a propósito (nadie puede leerlos directo)
 create policy "leer config" on public.config for select using (true);
 
 grant execute on function public.enviar_seleccion(uuid, int[]) to anon, authenticated;
+grant execute on function public.obtener_ranking(uuid) to anon, authenticated;
+grant execute on function public.obtener_avance() to anon, authenticated;
 
--- Tiempo real
-alter publication supabase_realtime add table public.votos;
+-- Tiempo real: solo en participantes (no expone votos)
 alter publication supabase_realtime add table public.participantes;
 ```
 
@@ -224,22 +249,24 @@ await supabase.rpc("enviar_seleccion", {
   p_dolores: Array.from(selected),
 });
 
-// Ranking en tiempo real
+// Ranking en tiempo real (solo si ya envió; la BD lo exige igual)
 useEffect(() => {
   const load = async () => {
-    const { data } = await supabase.from("ranking_dolores").select("*").order("posicion");
-    setRanking(data ?? []);
-    const { count } = await supabase
-      .from("participantes").select("*", { count: "exact", head: true }).eq("completo", true);
-    setCompletos(count ?? 0);
+    const { data: av } = await supabase.rpc("obtener_avance");
+    if (av?.[0]) { setCompletos(av[0].completaron); setTotal(av[0].total_esperado); }
+    if (yaEnvio) {
+      const { data } = await supabase.rpc("obtener_ranking", { p_participante: participanteId });
+      setRanking(data ?? []);
+    }
   };
   load();
-  const ch = supabase.channel("ranking")
-    .on("postgres_changes", { event: "*", schema: "public", table: "votos" }, load)
+  const ch = supabase.channel("avance")
     .on("postgres_changes", { event: "*", schema: "public", table: "participantes" }, load)
     .subscribe();
   return () => { supabase.removeChannel(ch); };
-}, []);
+}, [yaEnvio]);
+
+// Pestañas: solo se muestran cuando yaEnvio === true
 
 // Top 8 y animación de reordenado (filas de altura fija = ROW_H)
 const ROW_H = 68;

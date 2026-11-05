@@ -175,13 +175,13 @@
       <div class="feed" id="feed"></div>
     </div>
 
-    <div class="tabs" role="tablist">
+    <div class="tabs" role="tablist" id="tabs" hidden>
       <button class="tab" role="tab" id="tabVote" aria-selected="true" aria-controls="viewVote">Mi selección</button>
       <button class="tab" role="tab" id="tabRank" aria-selected="false" aria-controls="viewRank">Ranking en vivo</button>
     </div>
 
     <div id="viewVote" role="tabpanel">
-      <div id="sentBanner" class="sent-banner" hidden>Tu selección fue enviada. Mira cómo avanza el ranking en la pestaña “Ranking en vivo”.</div>
+      <div id="sentBanner" class="sent-banner" hidden>Tu selección fue enviada. Ya puedes ver el ranking en la pestaña “Ranking en vivo”.</div>
       <p class="lead">Marca hasta <strong>8 dolores</strong>. Al llegar a 8, los demás se bloquean. Puedes desmarcar uno para elegir otro antes de enviar.</p>
       <div class="list" id="list"></div>
       <div class="bar">
@@ -336,6 +336,7 @@
     if (sent || selected.size !== MAX) return;
     sent = true;
     submitVotes(Array.from(selected), user.nombre, user.cargo);
+    $("tabs").hidden = false;
     renderSelection(); showTab("rank");
   });
 
@@ -378,7 +379,7 @@
   $("tabVote").addEventListener("click", function () { showTab("vote"); });
   $("tabRank").addEventListener("click", function () { showTab("rank"); });
 
-  $("reset").addEventListener("click", function () { sent = false; selected.clear(); renderSelection(); showTab("vote"); startSim(11); });
+  $("reset").addEventListener("click", function () { sent = false; $("tabs").hidden = true; selected.clear(); renderSelection(); showTab("vote"); startSim(11); });
 
   renderSelection();
 })();
