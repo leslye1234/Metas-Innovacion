@@ -4,7 +4,7 @@ Orden de uso:
 1. Pega el **Prompt principal** (sección 1) en Lovable.
 2. Cuando Lovable pida conectar Supabase, conéctalo y ejecuta el **SQL** (sección 2) en el SQL Editor.
 3. Pega el **Prompt de datos** (sección 3) para cargar los 30 dolores de ejemplo.
-4. Adjunta `mockup/logo-calidda.webp` en el chat de Lovable junto al prompt principal.
+4. Adjunta `mockup/logo-calidda.webp` (blanco, para el acceso) y `mockup/logo-calidda-turquesa.png` (para las pantallas con fondo blanco) en el chat de Lovable junto al prompt principal.
 5. Compara con el boceto en `mockup/priorizacion-dolores.html`.
 
 ---
@@ -15,7 +15,7 @@ Orden de uso:
 Crea una aplicación web en español llamada "Priorización de dolores", con React + TypeScript + Tailwind y Supabase (base de datos + Realtime). Es para que unas 30 personas elijan en tiempo real los dolores más importantes de la compañía.
 
 DISEÑO
-- Fondo turquesa corporativo de Cálidda (#32C5DB) en toda la app, tarjetas blancas con sombra suave y esquinas redondeadas.
+- Fondo turquesa corporativo de Cálidda (#32C5DB) SOLO en la pantalla de acceso. Una vez que la persona ingresa (selección de dolores y ranking en vivo), el fondo de toda la página pasa a BLANCO (#FFFFFF). En esas pantallas las tarjetas, filas y la barra inferior son blancas con borde fino #BFE3EC (sin sombra), la zona de resumen usa fondo #E8F7FA y el logo de Cálidda del pie se muestra en turquesa (#32C5DB) en vez de blanco (te adjunto las dos versiones). En la pantalla de acceso las tarjetas son blancas con sombra suave y esquinas redondeadas; tarjetas blancas con sombra suave y esquinas redondeadas.
 - Arriba, en lugar del logo, va el título "Sesión de Estrategia" (en blanco y grande sobre la tarjeta de acceso; en pequeño, mayúsculas y azul muy oscuro en la pantalla de la aplicación).
 - El logo de Cálidda (te lo adjunto como imagen, es blanco con fondo transparente) va centrado en la parte INFERIOR de ambas pantallas, a unos 150 px de ancho. Guárdalo como asset del proyecto (src/assets/logo-calidda.png).
 - Color de acción: azul petróleo (#0B6E99, hover #07556F) para botones, pestañas activas y casillas. Textos sobre el fondo turquesa en azul muy oscuro (#04252F).
