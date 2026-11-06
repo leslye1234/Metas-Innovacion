@@ -80,11 +80,11 @@
 
   .ctl { display: none; flex: none; align-items: center; gap: 4px; }
   .rank.editing .ctl { display: flex; }
-  .ctl button { width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid var(--brand); background: var(--surface); color: var(--brand); font-weight: 700; cursor: pointer; line-height: 1; }
-  .ctl button:hover:not(:disabled) { background: var(--brand); color: var(--brand-ink); }
-  .ctl button:disabled { opacity: .3; cursor: not-allowed; }
-  .ctl .grip { width: 30px; height: 30px; display: grid; place-items: center; cursor: grab; color: var(--brand); touch-action: none; font-size: 18px; letter-spacing: -2px; }
-  .rank.editing .rrow { border-style: dashed; }
+  .ctl .grip { width: 30px; height: 30px; display: grid; place-items: center; color: var(--brand); touch-action: none; font-size: 18px; letter-spacing: -2px; }
+  .rank.editing .rrow { border-style: dashed; cursor: grab; touch-action: pan-y; }
+  .rank.editing .rrow .grip { touch-action: none; }
+  .rank.editing .rrow:hover:not(.dragging) { box-shadow: 0 3px 12px rgba(11,110,153,.22); }
+  .rrow.dragging { cursor: grabbing !important; }
 
   .footer-logo { display: flex; justify-content: center; margin-top: 36px; }
   .footer-logo img { width: 150px; height: auto; }
@@ -195,7 +195,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var votes, done, timer, simIdx;
   var complete = false, editing = false, saved = false;
-  var origPos = [], topSet = {}, order = [], backup = null;
+  var origPos = [], topSet = {}, order = [], backup = null, moved = {};
 
   function weightedPick() {
     var pool = DOLORES.map(function (_, i) { return i; }), out = [];
@@ -215,7 +215,7 @@
   function start(initial) {
     clearInterval(timer);
     votes = DOLORES.map(function () { return 0; }); done = 0; simIdx = 0;
-    complete = false; editing = false; saved = false; origPos = []; topSet = {}; backup = null;
+    complete = false; editing = false; saved = false; origPos = []; topSet = {}; backup = null; moved = {};
     for (var s = 0; s < initial; s++) { weightedPick().forEach(function (i) { votes[i]++; }); done++; simIdx++; }
     $("feed").textContent = "";
     order = byVotes(); render();
@@ -241,10 +241,8 @@
     var r = document.createElement("div"); r.className = "rrow";
     r.innerHTML = '<div class="pos"></div><div class="name"><span class="area">' + AREAS[i] + '<em class="mv"></em></span><span class="txt">' + t + '</span></div>' +
       '<div class="meter"><span></span></div><div class="pts"><span class="v">0</span><small>puntos</small></div>' +
-      '<div class="ctl"><button type="button" class="up" aria-label="Subir una posición">▲</button><button type="button" class="dn" aria-label="Bajar una posición">▼</button><span class="grip" aria-label="Arrastrar para mover" title="Arrastra para mover">⋮⋮</span></div>';
+      '<div class="ctl"><span class="grip" aria-hidden="true">⋮⋮</span></div>';
     rankEl.appendChild(r); rrows[i] = r;
-    r.querySelector(".up").addEventListener("click", function () { move(i, -1); });
-    r.querySelector(".dn").addEventListener("click", function () { move(i, 1); });
     bindDrag(r, i);
   });
   rankEl.style.height = DOLORES.length * ROW_H + "px";
@@ -257,7 +255,7 @@
     var st = $("status");
     st.className = "status" + (editing ? " edit" : complete ? " done" : "");
     $("statusTxt").textContent = editing ? "Modo edición" : saved ? "Orden final guardado" : complete ? "Votación completa" : "En vivo";
-    $("msg").innerHTML = editing ? "Mueve los dolores con <strong>▲ ▼</strong> o arrastrando <strong>⋮⋮</strong>. Los verdes se mantienen; los que suban pasan a amarillo."
+    $("msg").innerHTML = editing ? "<strong>Arrastra cualquier dolor</strong> hacia arriba o abajo y suéltalo en su nueva posición. Los verdes se mantienen; los que suban pasan a amarillo."
       : saved ? "<strong>Orden final guardado.</strong> Todos los que tengan el enlace ven este orden."
       : complete ? "<strong>Todos completaron su selección.</strong> Ya puedes modificar el ranking según el consenso."
       : "Esperando a que todas las personas completen sus 8 dolores…";
@@ -270,14 +268,13 @@
   function rowState(idx, pos) {
     var r = rrows[idx];
     var win = complete ? !!topSet[idx] : (pos < MAX && votes[idx] > 0);
-    var boost = complete && !topSet[idx] && pos < origPos[idx];
+    var boost = complete && !!moved[idx] && !topSet[idx] && pos < origPos[idx];
     r.classList.toggle("win", win); r.classList.toggle("boost", boost);
-    var mv = r.querySelector(".mv"), d = complete ? origPos[idx] - pos : 0;
+    var mv = r.querySelector(".mv"), d = complete && moved[idx] ? origPos[idx] - pos : 0;
     mv.textContent = d > 0 ? "▲ subió de #" + (origPos[idx] + 1) : d < 0 ? "▼ bajó de #" + (origPos[idx] + 1) : "";
     r.querySelector(".pos").textContent = pos + 1;
     r.querySelector(".v").textContent = votes[idx];
     r.querySelector(".meter span").style.width = Math.min(100, votes[idx] / TOTAL * 100) + "%";
-    r.querySelector(".up").disabled = pos === 0; r.querySelector(".dn").disabled = pos === DOLORES.length - 1;
   }
   var dragIdx = null;
   function layout() {
@@ -290,33 +287,32 @@
   }
 
   /* ---------- Edición ---------- */
-  function move(idx, delta) {
-    var from = order.indexOf(idx), to = Math.max(0, Math.min(order.length - 1, from + delta));
-    if (from === to) return;
-    order.splice(from, 1); order.splice(to, 0, idx); layout();
-  }
-  $("btnEdit").addEventListener("click", function () { backup = order.slice(); editing = true; render(); });
-  $("btnCancel").addEventListener("click", function () { order = backup.slice(); editing = false; render(); });
-  $("btnResetOrder").addEventListener("click", function () { order = byVotes(); render(); });
+  $("btnEdit").addEventListener("click", function () { backup = { o: order.slice(), m: Object.assign({}, moved) }; editing = true; render(); });
+  $("btnCancel").addEventListener("click", function () { order = backup.o.slice(); moved = backup.m; editing = false; render(); });
+  $("btnResetOrder").addEventListener("click", function () { order = byVotes(); moved = {}; render(); });
   $("btnSave").addEventListener("click", function () { editing = false; saved = true; render(); });
 
-  var dragY = 0, dragTimer = null, dragOffset = 0;
+  var dragY = 0, dragTimer = null, dragOffset = 0, startPos = 0;
   function bindDrag(r, idx) {
-    var g = r.querySelector(".grip");
-    g.addEventListener("pointerdown", function (e) {
-      if (!editing) return; e.preventDefault();
-      g.setPointerCapture(e.pointerId); dragIdx = idx; dragY = e.clientY;
-      var rr = r.getBoundingClientRect(); dragOffset = e.clientY - rr.top;
-      r.classList.add("dragging");
+    r.addEventListener("pointerdown", function (e) {
+      if (!editing || dragIdx !== null) return;
+      if (e.pointerType === "touch" && !e.target.closest(".grip")) return; // en celular se arrastra desde el asa para poder hacer scroll
+      e.preventDefault();
+      r.setPointerCapture(e.pointerId); dragIdx = idx; dragY = e.clientY;
+      dragOffset = e.clientY - r.getBoundingClientRect().top; startPos = order.indexOf(idx);
+      r.classList.add("dragging"); tip.classList.remove("show");
       dragTimer = setInterval(tick, 16);
     });
-    g.addEventListener("pointermove", function (e) { if (dragIdx === idx) dragY = e.clientY; });
-    function end() { if (dragIdx !== idx) return; clearInterval(dragTimer); dragIdx = null; r.classList.remove("dragging"); layout(); }
-    g.addEventListener("pointerup", end); g.addEventListener("pointercancel", end);
+    r.addEventListener("pointermove", function (e) { if (dragIdx === idx) dragY = e.clientY; });
+    function end() { if (dragIdx !== idx) return; clearInterval(dragTimer); if (order.indexOf(idx) !== startPos) moved[idx] = true; dragIdx = null; r.classList.remove("dragging"); layout(); }
+    r.addEventListener("pointerup", end); r.addEventListener("pointercancel", end);
   }
   function tick() {
     if (dragIdx === null) return;
-    if (dragY < 90) scrollBy(0, -14); else if (dragY > innerHeight - 90) scrollBy(0, 14);
+    var EDGE = 130, v = 0;
+    if (dragY < EDGE) v = -Math.ceil((EDGE - dragY) / EDGE * 38);
+    else if (dragY > innerHeight - EDGE) v = Math.ceil((dragY - (innerHeight - EDGE)) / EDGE * 38);
+    if (v) scrollBy(0, v);
     var top = rankEl.getBoundingClientRect().top, y = Math.max(0, Math.min((DOLORES.length - 1) * ROW_H, dragY - dragOffset - top));
     rrows[dragIdx].style.transform = "translateY(" + y + "px)";
     var target = Math.max(0, Math.min(DOLORES.length - 1, Math.round(y / ROW_H))), from = order.indexOf(dragIdx);

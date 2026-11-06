@@ -41,13 +41,16 @@ CUANDO TODOS TERMINAN (completaron >= total_esperado)
 - En ese momento se CONGELA quién es el Top 8 por votación: los 8 dolores que quedaron arriba por puntos. Ese conjunto no cambia aunque se muevan las filas.
 
 MODO EDICIÓN (botón "Modificar ranking")
-- Estado "Modo edición". Aparecen botones: "Guardar orden final" (verde), "Volver al orden por votos" y "Cancelar".
-- Cada fila muestra a la derecha tres controles: botón ▲ (subir una posición), botón ▼ (bajar una posición) y un asa ⋮⋮ para ARRASTRAR la fila a cualquier posición. Cualquier dolor, del 1 al último, se puede mover hacia arriba o hacia abajo. El arrastre debe hacer auto-scroll de la página cuando el puntero se acerca al borde superior o inferior de la pantalla, y las otras filas se reacomodan en vivo. Debe funcionar con mouse y con dedo (pointer events, touch-action: none en el asa). Deshabilita ▲ en la primera fila y ▼ en la última.
+- Estado "Modo edición". Aparecen botones: "Guardar orden final" (verde), "Volver al orden por votos" y "Cancelar". El texto de ayuda dice: "Arrastra cualquier dolor hacia arriba o abajo y suéltalo en su nueva posición."
+- NO hay botones de flecha. El reordenamiento es SOLO arrastrando: con el mouse, el usuario presiona sobre CUALQUIER parte de la fila de un dolor (cursor "grab"), la arrastra y la suelta en la posición que quiera. Debe poder llevar el dolor 15 al puesto 1 o el 1 al 30 en un solo movimiento. Cada fila muestra a la derecha un asa ⋮⋮ solo como pista visual.
+- Mientras se arrastra: la fila arrastrada sigue al puntero (sin transición, con sombra más fuerte y por encima de las demás) y las otras filas se reacomodan en vivo con animación. La página hace auto-scroll rápido cuando el puntero se acerca a los 130 px del borde superior o inferior de la pantalla, con velocidad proporcional a la cercanía al borde (hasta 38 px por cuadro), para poder cruzar los 30 dolores sin soltar.
+- En celular (dedo), la fila se arrastra tomándola desde el asa ⋮⋮ (touch-action: none en el asa; el resto de la fila deja hacer scroll normal).
+- Usa pointer events (pointerdown, pointermove, pointerup) con setPointerCapture. La posición destino es clamp(round(y / 74)) donde y es la posición vertical del puntero relativa a la lista.
 - REGLA DE COLORES (importante):
   * Los 8 dolores del Top 8 por votación SIEMPRE se quedan en verde, estén en la posición que estén. Mover otros dolores NO cambia el color de esos 8.
-  * Un dolor que NO estaba en el Top 8 por votación y que se sube a una posición mejor que la que tenía por votos se pinta AMARILLO (#FFF3BF, borde #E0A800, texto #6B4E00): significa que ahora se está considerando.
-  * Si un amarillo se vuelve a bajar hasta su posición original (o más abajo), vuelve al estilo normal.
-  * En cada fila movida muestra un texto pequeño junto al área: "▲ subió de #15" o "▼ bajó de #3" (la posición original por votos).
+  * Un dolor que NO estaba en el Top 8 por votación, que el usuario ARRASTRÓ él mismo y que ahora está en una posición mejor que la que tenía por votos se pinta AMARILLO (#FFF3BF, borde #E0A800, texto #6B4E00): significa que ahora se está considerando. Los dolores que solo se corrieron un puesto porque otro pasó por encima NO se pintan ni llevan texto de movimiento: solo los que se arrastraron.
+  * Si un amarillo se vuelve a bajar hasta su posición original (o más abajo), vuelve al estilo normal. Guarda en el estado la lista de ids "movidos a mano" (se vacía con "Volver al orden por votos" y "Cancelar").
+  * En cada fila que se arrastró muestra un texto pequeño junto al área: "▲ subió de #15" o "▼ bajó de #3" (la posición original por votos).
   * Los puntos nunca cambian al mover filas: son los votos reales.
 - "Guardar orden final": guarda el orden en Supabase con `guardar_orden_final`, sale del modo edición y el estado pasa a "Orden final guardado". Cualquiera que abra el panel después ve ese orden guardado (con los mismos colores) y en tiempo real si se vuelve a guardar. Debe existir "Modificar de nuevo".
 - "Volver al orden por votos": deja las filas en el orden por puntos (sin guardar todavía).
@@ -190,12 +193,12 @@ const inicial = data.some(d => d.pos_final != null)
 
 // 2) Colores (solo después de completar)
 const esVerde = (id: number, pos: number) => (completo ? top8.has(id) : pos < MAX && puntos(id) > 0);
-const esAmarillo = (id: number, pos: number) => completo && !top8.has(id) && pos < origPos.get(id)!;
+const esAmarillo = (id: number, pos: number) => completo && movidos.has(id) && !top8.has(id) && pos < origPos.get(id)!;
+// movidos: Set<number> con los ids que el facilitador arrastró a mano
 
-// 3) Mover
-const mover = (orden: number[], id: number, delta: number) => {
-  const from = orden.indexOf(id), to = Math.max(0, Math.min(orden.length - 1, from + delta));
-  const next = [...orden]; next.splice(from, 1); next.splice(to, 0, id); return next;
+// 3) Mover (al soltar/arrastrar): quitar el id de su lugar e insertarlo en el destino
+const moverA = (orden: number[], id: number, destino: number) => {
+  const next = orden.filter(x => x !== id); next.splice(destino, 0, id); return next;
 };
 
 // 4) Guardar
