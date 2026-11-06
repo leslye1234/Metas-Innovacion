@@ -40,6 +40,19 @@ CUANDO TODOS TERMINAN (completaron >= total_esperado)
 - El mensaje cambia a "Todos completaron su selección. Ya puedes modificar el ranking según el consenso." y aparece el botón "Modificar ranking".
 - En ese momento se CONGELA quién es el Top 8 por votación: los 8 dolores que quedaron arriba por puntos. Ese conjunto no cambia aunque se muevan las filas.
 
+PESTAÑAS DEL PANEL
+- Justo debajo de la tarjeta "Participación completada" hay dos pestañas, iguales en estilo a las de la plataforma de votación: "Ranking en vivo" (la lista de los dolores, con el modo edición) y "Gráfico de resultados". La pestaña activa va rellena azul petróleo (#0B6E99) con texto blanco; la inactiva, blanca con borde #BFE3EC. Por defecto está activa "Ranking en vivo".
+- La barra de acciones (mensaje, "Modificar ranking", "Guardar orden final"…) sigue visible en ambas pestañas.
+
+PESTAÑA "Gráfico de resultados" (es la MISMA que ven las personas en la plataforma de votación)
+- Se actualiza en tiempo real con cada voto, con cada arrastre en el modo edición (aunque todavía no se haya guardado) y con cada orden final guardado.
+- Chips de estado arriba: "Participación X de 30", el estado ("En vivo", "Votación completa", "Modo edición" en amarillo u "Orden final guardado" en verde) y, si hay dolores sumados, "Consenso · se suman N dolores". Leyenda: verde = "Más votados", amarillo = "Se suma por consenso".
+- Verde (#1FA463): los 8 más votados (el Top 8 por votación, congelado cuando completaron todos). Amarillo (#E0A800, fondo #FFF3BF): los dolores que no estaban en ese Top 8 y que el facilitador arrastró hacia arriba (posición actual mejor que la de votos). Los amarillos se SUMAN a los 8 verdes; los verdes nunca desaparecen.
+- Gráfico 1, "Dolores por área": una barra apilada por área (segmento verde y segmento amarillo) con el total a la derecha, de mayor a menor, contando solo los 8 verdes y los amarillos sumados.
+- Gráfico 2, "Mapa de calor del Top 8": una fila por dolor (primero los 8 verdes numerados 1 a 8; debajo los amarillos con el signo "+") por 7 columnas de dimensiones de impacto (Económico/financiero, Cliente, Operativo, Estratégico, Personas y capacidades, Riesgo/cumplimiento, Otras; salen de la columna `dimensiones`). Celdas verdes en las filas verdes, amarillas en las amarillas, gris muy claro donde no aplica y franjas grises si el dolor no tiene dimensiones. Al final, una fila "Total" con un número grande por columna (cuántos dolores tocan esa dimensión) y, si hay amarillos, una línea pequeña "verdes + amarillos" (por ejemplo "4 + 2"). Con scroll horizontal en celular.
+- No incluyas otros gráficos.
+- Los datos son los mismos que devuelve `obtener_panel` (necesita la columna `dimensiones`; ver la sección 5 de `PROMPT_LOVABLE.md`: agrega `dimensiones` al `returns table` y al `select` de `obtener_panel`).
+
 MODO EDICIÓN (botón "Modificar ranking")
 - Estado "Modo edición". Aparecen botones: "Guardar orden final" (verde), "Volver al orden por votos" y "Cancelar". El texto de ayuda dice: "Arrastra cualquier dolor hacia arriba o abajo y suéltalo en su nueva posición."
 - NO hay botones de flecha. El reordenamiento es SOLO arrastrando: con el mouse, el usuario presiona sobre CUALQUIER parte de la fila de un dolor (cursor "grab"), la arrastra y la suelta en la posición que quiera. Debe poder llevar el dolor 15 al puesto 1 o el 1 al 30 en un solo movimiento. Cada fila muestra a la derecha un asa ⋮⋮ solo como pista visual.
