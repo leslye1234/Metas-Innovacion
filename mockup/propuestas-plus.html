@@ -1,0 +1,283 @@
+<title>Propuestas Plus para Gerencias</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: resumen de propuestas arriba y una ficha por propuesta (texto a la izquierda, boceto a la derecha). */
+  :root {
+    color-scheme: light;
+    --bg: #ffffff; --surface: #ffffff; --ink: #0f2a3d; --muted: #55707f; --line: #bfe3ec;
+    --brand: #0b6e99; --brand-strong: #07556f; --brand-ink: #fff; --soft: #e8f7fa; --turq: #32c5db;
+    --win: #1fa463; --win-bg: #e1f5ea; --win-ink: #0c5a34; --rest: #a9c4d8;
+    --boost: #e0a800; --boost-bg: #fff3bf; --boost-ink: #6b4e00; --warn: #c2410c; --warn-bg: #ffe9dc;
+    --font-display: "Outfit", "Segoe UI", system-ui, sans-serif; --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+  .band { background: var(--turq); margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding: 28px max(16px, env(safe-area-inset-right, 0px)) 30px max(16px, env(safe-area-inset-left, 0px)); }
+  .wrap { width: 100%; max-width: 1040px; margin: 0 auto; }
+  .band h1 { font-size: 34px; color: #fff; text-shadow: 0 1px 8px rgba(4,37,47,.25); }
+  .band p { margin: 8px 0 0; color: #04252f; max-width: 62ch; font-size: 16px; }
+  .tag { display: inline-block; margin-bottom: 10px; font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #04252f; background: rgba(255,255,255,.65); padding: 4px 10px; border-radius: 999px; }
+
+  .note { margin: 22px 0 0; padding: 12px 16px; border: 2px solid var(--boost); background: var(--boost-bg); color: var(--boost-ink); border-radius: 12px; font-size: 14px; }
+
+  h2.sec { font-size: 22px; margin: 34px 0 12px; }
+  .table-scroll { overflow-x: auto; }
+  table.sum { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px; }
+  .sum th { text-align: left; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 2px solid var(--line); }
+  .sum td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .sum td a { color: var(--brand-strong); font-weight: 700; text-decoration: none; }
+  .sum td a:hover { text-decoration: underline; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .pill.hi { background: var(--win-bg); color: var(--win-ink); }
+  .pill.mid { background: var(--boost-bg); color: var(--boost-ink); }
+  .pill.lo { background: var(--soft); color: var(--brand-strong); }
+  .star { color: var(--boost); font-weight: 700; }
+
+  .prop { margin-top: 28px; border: 2px solid var(--line); border-radius: 16px; padding: 22px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; scroll-margin-top: 16px; }
+  .prop .ttl { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .prop .n { flex: none; width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; font: 700 17px var(--font-display); }
+  .prop h3 { font-size: 21px; line-height: 1.15; }
+  .prop p { margin: 0 0 10px; }
+  .prop .why { color: var(--muted); }
+  .prop ul { margin: 6px 0 12px; padding-left: 18px; } .prop li { margin-bottom: 4px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .mock { min-width: 0; border: 1.5px solid var(--line); border-radius: 12px; background: #f6fbfd; overflow: hidden; align-self: start; }
+  .mock .bar { background: var(--soft); border-bottom: 1.5px solid var(--line); padding: 7px 12px; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-strong); display: flex; gap: 6px; align-items: center; }
+  .mock .bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--rest); display: inline-block; }
+  .mock .body { padding: 14px; }
+  .b { display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: var(--brand); color: #fff; font: 700 12.5px var(--font-body); padding: 7px 12px; cursor: default; }
+  .b.ghost { background: #fff; color: var(--brand-strong); border: 1.5px solid var(--line); }
+  .b.ok { background: var(--win); }
+  .small { font-size: 12.5px; color: var(--muted); }
+  .row { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; margin-bottom: 7px; min-width: 0; }
+  .row .grow { flex: 1; min-width: 0; } .row .nm { font-weight: 600; font-size: 13.5px; line-height: 1.25; } .row .sub { font-size: 11.5px; color: var(--muted); }
+  .av { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--soft); color: var(--brand-strong); display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+  .track { height: 10px; border-radius: 999px; background: var(--soft); overflow: hidden; }
+  .track > span { display: block; height: 100%; background: var(--brand); border-radius: 999px; }
+  .hbar { display: grid; grid-template-columns: 138px minmax(0, 1fr) 34px; gap: 10px; align-items: center; margin-bottom: 8px; font-size: 13px; }
+  .hbar .track { height: 14px; } .hbar b { text-align: right; font-family: var(--font-display); font-size: 15px; }
+  .chip { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .chip.wait { background: var(--warn-bg); color: var(--warn); } .chip.okc { background: var(--win-bg); color: var(--win-ink); }
+  .chip.y { background: var(--boost-bg); color: var(--boost-ink); } .chip.b { background: var(--soft); color: var(--brand-strong); } .chip.r { background: var(--warn-bg); color: var(--warn); }
+  .div { display: grid; grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr); align-items: center; gap: 0; margin-bottom: 10px; }
+  .div .l, .div .r { height: 14px; background: var(--soft); position: relative; }
+  .div .l span { position: absolute; right: 0; top: 0; bottom: 0; background: var(--brand); border-radius: 999px 0 0 999px; }
+  .div .r span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--turq); border-radius: 0 999px 999px 0; }
+  .div .c { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); }
+  .dl { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; margin: 0 0 3px; }
+  .dl b { font-weight: 600; } .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); margin: 6px 0 12px; }
+  .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .tl { position: relative; padding-left: 20px; border-left: 3px solid var(--line); margin-left: 6px; }
+  .tl .ev { position: relative; margin-bottom: 12px; background: #fff; border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 11px; font-size: 13px; }
+  .tl .ev::before { content: ""; position: absolute; left: -30px; top: 14px; width: 13px; height: 13px; border-radius: 50%; background: var(--boost); border: 3px solid #fff; }
+  .tl .ev.g::before { background: var(--win); } .tl .ev .t { font-size: 11.5px; color: var(--muted); } .tl .ev q { display: block; margin-top: 4px; font-style: italic; color: var(--ink); quotes: "“" "”"; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 520px; background: #fff; }
+  .tbl th { text-align: left; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 7px 8px; border-bottom: 2px solid var(--line); }
+  .tbl td { padding: 8px; border-bottom: 1px solid var(--line); }
+  .ordl { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 10px; padding: 7px 10px; margin-bottom: 6px; font-size: 13px; }
+  .ordl .rk { flex: none; width: 26px; height: 26px; border-radius: 8px; background: var(--brand); color: #fff; display: grid; place-items: center; font: 700 13px var(--font-display); }
+  .ordl .pt { margin-left: auto; flex: none; font: 700 13px var(--font-display); color: var(--win-ink); background: var(--win-bg); border-radius: 999px; padding: 3px 10px; }
+  .ordl .gp { flex: none; color: var(--brand); letter-spacing: -2px; font-size: 16px; }
+  .room { aspect-ratio: 16 / 9; background: var(--turq); border-radius: 10px; padding: 16px 18px; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; color: #04252f; overflow: hidden; min-height: 250px; }
+  .room h4 { margin: 0 0 8px; font: 700 18px var(--font-display); color: #fff; text-shadow: 0 1px 6px rgba(4,37,47,.25); }
+  .room .rw { display: grid; grid-template-columns: 22px minmax(0, 1fr) 30px; gap: 8px; align-items: center; background: rgba(255,255,255,.92); border-radius: 8px; padding: 5px 8px; margin-bottom: 5px; font-size: 12px; font-weight: 600; }
+  .room .rw.g { background: #e1f5ea; color: #0c5a34; } .room .rw b { text-align: right; font-family: var(--font-display); font-size: 14px; }
+  .room .side { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; }
+  .room .big { font: 700 44px/1 var(--font-display); color: #fff; text-shadow: 0 1px 8px rgba(4,37,47,.25); } .room .clock { font: 600 22px var(--font-display); }
+  .room .live { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: #fff; border-radius: 999px; padding: 4px 12px; }
+
+  .reco { margin-top: 34px; border: 3px solid var(--brand); border-radius: 16px; padding: 20px 22px; box-shadow: 0 4px 14px rgba(11,110,153,.15); }
+  .reco h2 { font-size: 22px; margin-bottom: 8px; } .reco ol { margin: 8px 0 0; padding-left: 20px; } .reco li { margin-bottom: 6px; }
+  @media (max-width: 820px) { .prop { grid-template-columns: minmax(0, 1fr); padding: 16px; } .band h1 { font-size: 27px; } .hbar { grid-template-columns: 100px minmax(0, 1fr) 30px; } .room { grid-template-columns: minmax(0, 1fr); aspect-ratio: auto; } }
+</style>
+
+<div class="band"><div class="wrap">
+  <span class="tag">Sesión de Estrategia</span>
+  <h1>Propuestas para dar un nivel más alto a gerentes y subgerentes</h1>
+  <p>Ocho ideas, cada una con su boceto. Ninguna está implementada: sirven para evaluar cuáles aportan más antes de decidir qué se construye.</p>
+</div></div>
+
+<div class="wrap">
+  <div class="note"><strong>Todo es ejemplo.</strong> Los nombres, cifras y textos de los bocetos son inventados para que se entienda la idea. No son datos reales de la compañía.</div>
+
+  <h2 class="sec">Resumen y mi recomendación</h2>
+  <div class="table-scroll"><table class="sum">
+    <thead><tr><th>#</th><th>Propuesta</th><th>Para quién</th><th>Valor</th><th>Esfuerzo</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><a href="#p1">Quién falta y recordatorio</a> <span class="star">★</span></td><td>Facilitador</td><td><span class="pill hi">Alto</span></td><td><span class="pill hi">Bajo</span></td></tr>
+      <tr><td>2</td><td><a href="#p2">Mapa por área</a> <span class="star">★</span></td><td>Todos</td><td><span class="pill hi">Alto</span></td><td><span class="pill hi">Bajo</span></td></tr>
+      <tr><td>3</td><td><a href="#p3">Gerentes frente a subgerentes</a></td><td>Facilitador y gerencia</td><td><span class="pill hi">Alto</span></td><td><span class="pill mid">Medio</span></td></tr>
+      <tr><td>4</td><td><a href="#p4">Ordena tus 8 (con peso)</a></td><td>Quien vota</td><td><span class="pill mid">Medio</span></td><td><span class="pill mid">Medio</span></td></tr>
+      <tr><td>5</td><td><a href="#p5">Matriz de impacto y esfuerzo</a></td><td>Sala completa</td><td><span class="pill hi">Alto</span></td><td><span class="pill mid">Medio</span></td></tr>
+      <tr><td>6</td><td><a href="#p6">Registro de decisiones por consenso</a> <span class="star">★</span></td><td>Facilitador y gerencia</td><td><span class="pill hi">Alto</span></td><td><span class="pill hi">Bajo</span></td></tr>
+      <tr><td>7</td><td><a href="#p7">Del ranking a la acción (plan y acta)</a> <span class="star">★</span></td><td>Todos</td><td><span class="pill hi">Muy alto</span></td><td><span class="pill mid">Medio</span></td></tr>
+      <tr><td>8</td><td><a href="#p8">Modo sala (pantalla grande)</a></td><td>Sala completa</td><td><span class="pill mid">Medio</span></td><td><span class="pill hi">Bajo</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="reco">
+    <h2>Si tuviera que elegir</h2>
+    <p style="margin:0">Las marcadas con ★ dan más resultado por menos trabajo. En este orden:</p>
+    <ol>
+      <li><strong>Del ranking a la acción (7):</strong> es lo que un gerente se lleva de la sesión. Un ranking sin responsables ni fechas se olvida.</li>
+      <li><strong>Registro de decisiones (6):</strong> deja constancia de por qué se movió cada dolor. Da respaldo ante preguntas posteriores.</li>
+      <li><strong>Mapa por área (2) y Quién falta (1):</strong> se construyen con datos que ya tenemos y se notan desde el primer minuto de la sesión.</li>
+    </ol>
+  </div>
+
+  <!-- 1 -->
+  <section class="prop" id="p1">
+    <div>
+      <div class="ttl"><span class="n">1</span><h3>Quién falta y recordatorio</h3></div>
+      <p>El facilitador ve en el panel quiénes aún no enviaron su selección, con su cargo y el tiempo que llevan pendientes, y puede recordarles con un clic.</p>
+      <p class="why">La votación termina cuando vota el último. Hoy no hay forma de saber a quién esperar.</p>
+      <ul><li>Lista de pendientes con cargo y área.</li><li>Botón “Recordar” por persona o a todos.</li><li>Cronómetro de la sesión y tiempo estimado de cierre.</li></ul>
+      <div class="meta"><span class="pill hi">Valor alto</span><span class="pill hi">Esfuerzo bajo</span><span class="pill lo">Panel del facilitador</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Panel del facilitador</div><div class="body">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px"><strong style="font:700 16px var(--font-display)">23 de 30 completaron</strong><span class="small">Tiempo de sesión 14:32</span></div>
+      <div class="track" style="margin-bottom:12px"><span style="width:77%"></span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px"><span class="small"><b>7 pendientes</b></span><span class="b">Recordar a todos</span></div>
+      <div class="row"><span class="av">MQ</span><span class="grow"><div class="nm">María Quispe</div><div class="sub">Subgerente · Operaciones</div></span><span class="chip wait">Pendiente 12 min</span><span class="b ghost">Recordar</span></div>
+      <div class="row"><span class="av">CH</span><span class="grow"><div class="nm">Carlos Huamán</div><div class="sub">Gerente · Comercial</div></span><span class="chip wait">Pendiente 9 min</span><span class="b ghost">Recordar</span></div>
+      <div class="row"><span class="av">RM</span><span class="grow"><div class="nm">Rosa Mendoza</div><div class="sub">Subgerente · Finanzas</div></span><span class="chip y">Eligiendo (5/8)</span><span class="b ghost">Recordar</span></div>
+      <div class="row" style="margin:0"><span class="av">JC</span><span class="grow"><div class="nm">Jorge Castillo</div><div class="sub">Gerente · Legal</div></span><span class="chip wait">Aún no ingresó</span><span class="b ghost">Recordar</span></div>
+    </div></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="prop" id="p2">
+    <div>
+      <div class="ttl"><span class="n">2</span><h3>Mapa por área</h3></div>
+      <p>Una vista que suma los votos por área y muestra qué áreas concentran más dolores priorizados, con el dolor líder de cada una.</p>
+      <p class="why">Los gerentes piensan por área. Ver “dónde duele más” les da una conversación distinta a la de una lista de 30 dolores.</p>
+      <ul><li>Barras por área con votos del Top 8 o de todos los dolores.</li><li>Dolor más votado de cada área al pasar el mouse.</li></ul>
+      <div class="meta"><span class="pill hi">Valor alto</span><span class="pill hi">Esfuerzo bajo</span><span class="pill lo">Ranking y panel</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Votos por área</div><div class="body" id="mapa"></div></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="prop" id="p3">
+    <div>
+      <div class="ttl"><span class="n">3</span><h3>Gerentes frente a subgerentes</h3></div>
+      <p>Al ingresar, la persona indica si es gerente o subgerente. El panel compara qué priorizó cada nivel y marca los dolores donde hay brecha.</p>
+      <p class="why">Si la gerencia ve un dolor como crítico y sus equipos no, esa diferencia es la conversación más valiosa de la sesión.</p>
+      <ul><li>Un campo más en el acceso: nivel (gerente o subgerente).</li><li>Barras enfrentadas con alerta de “brecha alta”.</li></ul>
+      <div class="meta"><span class="pill hi">Valor alto</span><span class="pill mid">Esfuerzo medio</span><span class="pill lo">Acceso y panel</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Brecha entre niveles</div><div class="body" id="brecha"></div></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="prop" id="p4">
+    <div>
+      <div class="ttl"><span class="n">4</span><h3>Ordena tus 8</h3></div>
+      <p>Después de marcar sus 8, la persona los ordena arrastrando: el primero vale 8 puntos, el segundo 7, y así hasta 1. El ranking usa esos puntos en vez de contar solo 1 por voto.</p>
+      <p class="why">Separa lo urgente de lo importante: no es lo mismo que un dolor sea tu primera o tu octava prioridad. Evita empates.</p>
+      <ul><li>Un paso extra antes de enviar.</li><li>Opcional: se puede dejar activado o no según el estilo de la sesión.</li></ul>
+      <div class="meta"><span class="pill mid">Valor medio</span><span class="pill mid">Esfuerzo medio</span><span class="pill lo">Pantalla de selección</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Ordena tus 8 prioridades</div><div class="body" id="ordena"></div></div>
+  </section>
+
+  <!-- 5 -->
+  <section class="prop" id="p5">
+    <div>
+      <div class="ttl"><span class="n">5</span><h3>Matriz de impacto y esfuerzo</h3></div>
+      <p>Con el Top 8 definido, la sala ubica cada dolor según su impacto en el negocio y el esfuerzo para resolverlo. Se ve de inmediato qué atacar primero.</p>
+      <p class="why">Pasa de “qué duele” a “por dónde empezamos”. Es el lenguaje que usan las gerencias para decidir.</p>
+      <ul><li>Cada burbuja es un dolor; su tamaño son los votos.</li><li>Cuadrantes: ganancias rápidas, proyectos grandes, a vigilar y de baja prioridad.</li><li>El facilitador arrastra cada burbuja con la sala.</li></ul>
+      <div class="meta"><span class="pill hi">Valor alto</span><span class="pill mid">Esfuerzo medio</span><span class="pill lo">Panel del facilitador</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Matriz del Top 8</div><div class="body" id="matriz"></div></div>
+  </section>
+
+  <!-- 6 -->
+  <section class="prop" id="p6">
+    <div>
+      <div class="ttl"><span class="n">6</span><h3>Registro de decisiones por consenso</h3></div>
+      <p>Cada vez que el facilitador mueve un dolor en el modo edición, aparece un cuadro corto para anotar el motivo. Todo queda en una línea de tiempo.</p>
+      <p class="why">Cuando alguien pregunte “¿por qué este dolor quedó tercero si tuvo pocos votos?”, la respuesta ya está escrita, con hora.</p>
+      <ul><li>Motivo en una frase y quién lo propuso.</li><li>Los dolores amarillos muestran su motivo al pasar el mouse.</li></ul>
+      <div class="meta"><span class="pill hi">Valor alto</span><span class="pill hi">Esfuerzo bajo</span><span class="pill lo">Panel del facilitador</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Decisiones de la sesión</div><div class="body">
+      <div class="tl">
+        <div class="ev"><div class="t">11:42 · Propuesto por Gerencia Comercial</div><b>Conexiones nuevas que demoran en concretarse</b> &nbsp;<span class="chip y">▲ #15 → #3</span><q>Impacta directamente la meta de nuevas conexiones del trimestre.</q></div>
+        <div class="ev"><div class="t">11:47 · Propuesto por Gerencia de Operaciones</div><b>Falta de integración entre sistemas</b> &nbsp;<span class="chip y">▲ #12 → #6</span><q>Es la causa raíz de otros dos dolores del Top 8.</q></div>
+        <div class="ev g" style="margin-bottom:0"><div class="t">11:55 · Orden final guardado</div><b>Top 8 confirmado por la sala</b> &nbsp;<span class="chip okc">2 cambios por consenso</span></div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- 7 -->
+  <section class="prop" id="p7">
+    <div>
+      <div class="ttl"><span class="n">7</span><h3>Del ranking a la acción: plan y acta</h3></div>
+      <p>Al guardar el orden final, cada dolor del Top 8 recibe un área responsable, una fecha y un estado. Con un clic se genera el acta de la sesión para descargar.</p>
+      <p class="why">Es lo que un gerente se lleva y presenta. Convierte un ejercicio de votación en compromisos con nombre y fecha.</p>
+      <ul><li>Responsable, plazo y estado por dolor.</li><li>Acta lista en PDF, Excel o PowerPoint con el logo de Cálidda.</li><li>Incluye votos, motivo de los cambios y fecha de la sesión.</li></ul>
+      <div class="meta"><span class="pill hi">Valor muy alto</span><span class="pill mid">Esfuerzo medio</span><span class="pill lo">Panel del facilitador</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Plan de acción del Top 8</div><div class="body">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-bottom:10px"><span class="b ghost">Descargar PDF</span><span class="b ghost">Excel</span><span class="b">PowerPoint</span></div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>#</th><th>Dolor</th><th>Responsable</th><th>Plazo</th><th>Estado</th></tr></thead><tbody>
+        <tr><td><b>1</b></td><td>Procesos internos lentos y burocráticos</td><td>Operaciones</td><td>30 ene</td><td><span class="chip b">Por iniciar</span></td></tr>
+        <tr><td><b>2</b></td><td>Datos poco confiables para decidir</td><td>Finanzas</td><td>15 feb</td><td><span class="chip b">Por iniciar</span></td></tr>
+        <tr><td><b>3</b></td><td>Conexiones nuevas que demoran</td><td>Comercial</td><td>28 feb</td><td><span class="chip y">En curso</span></td></tr>
+        <tr><td><b>4</b></td><td>Demoras en la atención de reclamos</td><td>Experiencia del Cliente</td><td>15 mar</td><td><span class="chip y">En curso</span></td></tr>
+        <tr><td><b>5</b></td><td>Alta rotación de personal clave</td><td>Gestión de personas</td><td>31 mar</td><td><span class="chip r">Sin responsable</span></td></tr>
+      </tbody></table></div>
+      <p class="small" style="margin:8px 0 0">Se muestran 5 de 8 filas.</p>
+    </div></div>
+  </section>
+
+  <!-- 8 -->
+  <section class="prop" id="p8">
+    <div>
+      <div class="ttl"><span class="n">8</span><h3>Modo sala</h3></div>
+      <p>Una vista pensada para proyectar: letra grande, solo los primeros lugares, el avance de la votación y un reloj. Se abre con un botón desde el panel.</p>
+      <p class="why">En la sala, el ranking se sigue de lejos. Una vista limpia y de gran tamaño hace que la sesión se sienta como un evento, no como una hoja de cálculo.</p>
+      <ul><li>Los primeros del ranking con barras grandes y colores de la marca.</li><li>Contador de participación y cronómetro de la sesión.</li><li>Aviso visual al llegar al 100%.</li></ul>
+      <div class="meta"><span class="pill mid">Valor medio</span><span class="pill hi">Esfuerzo bajo</span><span class="pill lo">Panel del facilitador</span></div>
+    </div>
+    <div class="mock"><div class="bar"><i></i><i></i><i></i> Pantalla proyectada</div><div class="body" style="padding:10px"><div class="room" id="sala"></div></div></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  function h(html) { var d = document.createElement("div"); d.innerHTML = html; return d; }
+  /* 2: mapa por área */
+  var areas = [["Operaciones", 61, "Procesos internos lentos y burocráticos"], ["Experiencia del Cliente", 48, "Demoras en la atención de reclamos"], ["Finanzas", 37, "Datos poco confiables para decidir"], ["Comercial", 31, "Conexiones nuevas que demoran"], ["Gestión de personas", 24, "Alta rotación de personal clave"], ["Seguridad Integral", 18, "Reporte tardío de incidentes"], ["Legal", 12, "Contratos con aprobaciones lentas"]];
+  var max = areas[0][1], m = document.getElementById("mapa");
+  m.innerHTML = '<div class="small" style="margin-bottom:10px">Votos acumulados por área (ejemplo con 30 personas)</div>' +
+    areas.map(function (a, i) { return '<div class="hbar" title="Dolor líder: ' + a[2] + '"><span>' + a[0] + '</span><div class="track"><span style="width:' + (a[1] / max * 100) + '%;background:' + (i < 3 ? "var(--win)" : "var(--rest)") + '"></span></div><b>' + a[1] + '</b></div>'; }).join("") +
+    '<div class="small" style="margin-top:10px;border-top:1.5px solid var(--line);padding-top:10px">Dolor líder en Operaciones: <b style="color:var(--ink)">Procesos internos lentos y burocráticos</b> (22 votos)</div>';
+  /* 3: brecha */
+  var br = [["Datos poco confiables para decidir", 78, 41], ["Procesos internos lentos y burocráticos", 70, 74], ["Alta rotación de personal clave", 35, 72], ["Demoras en la atención de reclamos", 60, 55], ["Metas comerciales poco alineadas", 66, 28]];
+  document.getElementById("brecha").innerHTML = '<div class="legend"><span><i style="background:var(--brand)"></i>Gerentes (8 personas)</span><span><i style="background:var(--turq)"></i>Subgerentes (22 personas)</span></div>' +
+    br.map(function (r) { var gap = Math.abs(r[1] - r[2]); return '<div class="dl"><b>' + r[0] + '</b>' + (gap >= 25 ? '<span class="chip r">Brecha ' + gap + ' pts</span>' : '<span class="chip okc">Alineados</span>') + '</div><div class="div"><div class="l"><span style="width:' + r[1] + '%"></span></div><div class="c">' + '</div><div class="r"><span style="width:' + r[2] + '%"></span></div></div><div class="dl small" style="margin-top:-6px;margin-bottom:10px"><span>' + r[1] + '% lo eligió</span><span>' + r[2] + '% lo eligió</span></div>'; }).join("");
+  /* 4: ordena tus 8 */
+  var o8 = [["Datos poco confiables para decidir", "FINANZAS"], ["Procesos internos lentos y burocráticos", "OPERACIONES"], ["Conexiones nuevas que demoran en concretarse", "COMERCIAL"], ["Demoras en la atención de reclamos", "EXPERIENCIA DEL CLIENTE"], ["Alta rotación de personal clave", "GESTIÓN DE PERSONAS"], ["Falta de integración entre sistemas", "OPERACIONES"], ["Reporte tardío de incidentes", "SEGURIDAD INTEGRAL"], ["Contratos con aprobaciones lentas", "LEGAL"]];
+  document.getElementById("ordena").innerHTML = '<div class="small" style="margin-bottom:10px">Arrastra para ordenar: tu primera prioridad vale <b style="color:var(--ink)">8 puntos</b> y la última, 1.</div>' +
+    o8.map(function (d, i) { return '<div class="ordl"><span class="rk">' + (i + 1) + '</span><span style="min-width:0"><span class="small" style="display:block;font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--brand-strong)">' + d[1] + '</span>' + d[0] + '</span><span class="pt">' + (8 - i) + ' pts</span><span class="gp">⋮⋮</span></div>'; }).join("") +
+    '<div style="text-align:right;margin-top:10px"><span class="b ok">Enviar selección</span></div>';
+  /* 5: matriz */
+  var pts = [["1", 16, 78, 26, "Datos poco confiables"], ["2", 70, 82, 30, "Procesos lentos"], ["3", 30, 62, 22, "Conexiones nuevas"], ["4", 22, 40, 20, "Reclamos"], ["5", 78, 58, 18, "Rotación"], ["6", 60, 28, 18, "Integración de sistemas"], ["7", 16, 22, 14, "Incidentes"], ["8", 38, 18, 14, "Contratos"]];
+  var W = 420, H = 300, svg = '<svg viewBox="0 0 ' + W + ' ' + (H + 28) + '" width="100%" role="img" aria-label="Matriz de impacto y esfuerzo del Top 8">';
+  svg += '<rect x="30" y="4" width="195" height="146" fill="#e1f5ea"/><rect x="225" y="4" width="195" height="146" fill="#e8f7fa"/><rect x="30" y="150" width="195" height="146" fill="#f1f6fa"/><rect x="225" y="150" width="195" height="146" fill="#fff3bf" fill-opacity=".55"/>';
+  svg += '<text x="38" y="22" font-size="11" font-weight="700" fill="#0c5a34">GANANCIAS RÁPIDAS</text><text x="233" y="22" font-size="11" font-weight="700" fill="#07556f">PROYECTOS GRANDES</text><text x="38" y="288" font-size="11" font-weight="700" fill="#55707f">BAJA PRIORIDAD</text><text x="233" y="288" font-size="11" font-weight="700" fill="#6b4e00">A VIGILAR</text>';
+  svg += '<line x1="30" y1="150" x2="420" y2="150" stroke="#bfe3ec"/><line x1="225" y1="4" x2="225" y2="296" stroke="#bfe3ec"/><rect x="30" y="4" width="390" height="292" fill="none" stroke="#bfe3ec" stroke-width="1.5"/>';
+  pts.forEach(function (p) { var cx = 30 + p[1] / 100 * 390, cy = 296 - p[2] / 100 * 292; svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + p[3] / 1.6 + '" fill="#0b6e99" fill-opacity=".88"/><text x="' + cx + '" y="' + (cy + 5) + '" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">' + p[0] + '</text>'; });
+  svg += '<text x="225" y="320" text-anchor="middle" font-size="11" fill="#55707f">Esfuerzo para resolverlo →</text><text transform="translate(12 150) rotate(-90)" text-anchor="middle" font-size="11" fill="#55707f">Impacto en el negocio →</text></svg>';
+  document.getElementById("matriz").innerHTML = svg + '<div class="legend" style="margin:8px 0 0">' + pts.map(function (p) { return '<span><b style="color:var(--ink)">' + p[0] + '</b> ' + p[4] + '</span>'; }).join("") + '</div>';
+  /* 8: sala */
+  var top = [["Procesos internos lentos y burocráticos", 24], ["Datos poco confiables para decidir", 22], ["Conexiones nuevas que demoran", 19], ["Demoras en la atención de reclamos", 17], ["Alta rotación de personal clave", 15], ["Falta de integración entre sistemas", 14]];
+  document.getElementById("sala").innerHTML = '<div><h4>Ranking en vivo</h4>' + top.map(function (t, i) { return '<div class="rw g"><span>' + (i + 1) + '</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + t[0] + '</span><b>' + t[1] + '</b></div>'; }).join("") + '</div><div class="side"><span class="live">● En vivo</span><div class="big">23/30</div><div style="font-weight:700">completaron</div><div class="clock">14:32</div></div>';
+})();
+</script>
