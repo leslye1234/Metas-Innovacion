@@ -57,6 +57,13 @@ DATOS (Supabase)
 - Para el tiempo real, suscríbete a cambios en `participantes` (cada vez que alguien envía cambia su fila) y vuelve a llamar a `obtener_ranking` y `obtener_avance`.
 - El envío debe ser una sola llamada a la función RPC `enviar_seleccion(p_participante uuid, p_dolores int[])`, que valida que sean exactamente 8 dolores distintos y que el participante no haya enviado antes.
 
+DETALLE DE CADA DOLOR (al pasar el mouse)
+- Al pasar el mouse sobre el texto de un dolor (en la lista de selección y en el ranking) aparece una tarjeta flotante blanca con borde azul petróleo de 2 px, esquinas redondeadas y sombra, de máximo 360 px de ancho. Contiene: el área en letras pequeñas, el título del dolor y tres bloques con su etiqueta en mayúsculas pequeñas: "Definición del dolor", "Evidencia" e "Impacto".
+- Los textos salen de las columnas `definicion`, `evidencia` e `impacto` de la tabla `dolores` (pueden ser texto largo y varían por dolor).
+- Se posiciona debajo de la fila; si no hay espacio abajo, aparece arriba. Nunca se sale de la pantalla. Aparece con un fundido corto y se cierra al sacar el mouse o al hacer scroll.
+- En celular y teclado: junto a cada dolor de la lista hay un pequeño botón circular con una "i". Al tocarlo se abre/cierra la misma tarjeta, SIN marcar ni desmarcar el dolor. Tocar fuera la cierra.
+- Marcar el dolor se hace con clic en cualquier parte de la fila, y se puede usar el teclado (Tab para moverse, Espacio o Enter para marcar).
+
 Accesibilidad: botones con role="checkbox" y aria-checked, foco visible, contraste suficiente.
 ```
 
@@ -70,6 +77,9 @@ create table public.dolores (
   id serial primary key,
   area text not null,
   texto text not null,
+  definicion text,
+  evidencia text,
+  impacto text,
   activo boolean not null default true
 );
 
@@ -101,7 +111,7 @@ insert into public.config default values;
 
 -- Ranking: SOLO lo entrega a quien ya envió su selección (evita el sesgo)
 create or replace function public.obtener_ranking(p_participante uuid)
-returns table (id int, area text, texto text, puntos int, posicion bigint)
+returns table (id int, area text, texto text, definicion text, evidencia text, impacto text, puntos int, posicion bigint)
 language plpgsql
 security definer
 set search_path = public
@@ -111,13 +121,13 @@ begin
     raise exception 'El ranking se habilita después de enviar tu selección';
   end if;
   return query
-    select d.id, d.area, d.texto, count(v.dolor_id)::int,
+    select d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto, count(v.dolor_id)::int,
            row_number() over (order by count(v.dolor_id) desc, d.id)
     from public.dolores d
     left join public.votos v on v.dolor_id = d.id
     where d.activo
-    group by d.id, d.area, d.texto
-    order by 5;
+    group by d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto
+    order by 8;
 end;
 $$;
 
@@ -187,41 +197,41 @@ alter publication supabase_realtime add table public.participantes;
 ## 3. Prompt de datos: los 30 dolores de ejemplo
 
 ```
-Inserta en la tabla `dolores` estos 30 dolores de ejemplo, cada uno con su área (Legal, FNB, Experiencia del Cliente, Gestión de personas, Sostenibilidad, Operaciones, Comercial, Seguridad Integral, Finanzas). Después los reemplazaré por los reales, así que la app debe leer siempre la lista y el área desde la tabla y no tener textos fijos en el código. El área puede variar y no todas tienen la misma cantidad de dolores.
+Inserta en la tabla `dolores` estos 30 dolores de ejemplo, cada uno con su área, definición, evidencia e impacto (Legal, FNB, Experiencia del Cliente, Gestión de personas, Sostenibilidad, Operaciones, Comercial, Seguridad Integral, Finanzas). Después los reemplazaré por los reales, así que la app debe leer siempre la lista y el área desde la tabla y no tener textos fijos en el código. El área puede variar y no todas tienen la misma cantidad de dolores.
 ```
 
 ```sql
-insert into public.dolores (area, texto) values
-('Legal','Contratos con aprobaciones lentas y de varios pasos'),
-('Legal','Cambios regulatorios que no se comunican a tiempo a las áreas'),
-('Legal','Poco seguimiento a procesos y reclamos legales en curso'),
-('FNB','Baja bancarización de clientes que limita el acceso al financiamiento'),
-('FNB','Demora en la evaluación y aprobación de créditos'),
-('FNB','Cartera morosa con seguimiento tardío'),
-('Experiencia del Cliente','Demoras en la atención de reclamos'),
-('Experiencia del Cliente','Respuestas distintas según el canal de atención'),
-('Experiencia del Cliente','Clientes sin información clara del estado de su solicitud'),
-('Experiencia del Cliente','Facturas confusas que generan consultas repetidas'),
-('Gestión de personas','Alta rotación de personal clave'),
-('Gestión de personas','Falta de planes de desarrollo y línea de carrera'),
-('Gestión de personas','Carga laboral desbalanceada entre equipos'),
-('Sostenibilidad','Impacto ambiental de las obras sin medición consistente'),
-('Sostenibilidad','Poca articulación con las comunidades de las zonas de trabajo'),
-('Sostenibilidad','Indicadores ESG reportados de forma manual y dispersa'),
-('Operaciones','Retrasos en la ejecución de obras'),
-('Operaciones','Falta de integración entre sistemas'),
-('Operaciones','Procesos internos lentos y burocráticos'),
-('Operaciones','Emergencias y fugas atendidas con tiempos altos'),
-('Operaciones','Exceso de reportes manuales'),
-('Comercial','Conexiones nuevas que demoran en concretarse'),
-('Comercial','Falta de seguimiento a prospectos'),
-('Comercial','Metas comerciales poco alineadas con la capacidad operativa'),
-('Seguridad Integral','Daños a la red por terceros durante excavaciones'),
-('Seguridad Integral','Cumplimiento desigual de normas de seguridad en contratistas'),
-('Seguridad Integral','Reporte tardío de incidentes'),
-('Finanzas','Datos poco confiables para decidir'),
-('Finanzas','Cierres contables con muchas tareas manuales'),
-('Finanzas','Presupuestos que se desvían sin alertas tempranas');
+insert into public.dolores (area, texto, definicion, evidencia, impacto) values
+('Legal','Contratos con aprobaciones lentas y de varios pasos','Los contratos pasan por varias revisiones una tras otra antes de firmarse.','Aprobación promedio de 18 días hábiles frente a una meta de 7.','Retrasa el inicio de obras y servicios y tensa la relación con proveedores.'),
+('Legal','Cambios regulatorios que no se comunican a tiempo a las áreas','Las nuevas normas se publican, pero no llegan de forma ordenada a las áreas que deben aplicarlas.','Dos cambios regulatorios del último año se conocieron semanas después de entrar en vigencia.','Riesgo de incumplir y de recibir observaciones o multas.'),
+('Legal','Poco seguimiento a procesos y reclamos legales en curso','No hay un tablero único que muestre el estado de los procesos y reclamos legales abiertos.','El seguimiento se lleva en hojas de cálculo distintas, con fechas desactualizadas.','Plazos vencidos y poca visibilidad del riesgo para la gerencia.'),
+('FNB','Baja bancarización de clientes que limita el acceso al financiamiento','Muchos clientes no tienen historial bancario y no califican a los productos de financiamiento.','Cerca del 40% de las solicitudes se descarta por falta de historial crediticio.','Se pierden ventas y clientes que podrían conectarse al servicio.'),
+('FNB','Demora en la evaluación y aprobación de créditos','La evaluación de un crédito requiere validaciones manuales en varios sistemas.','El tiempo de respuesta supera los 5 días, cuando el cliente espera menos de 2.','Los clientes desisten o buscan otra alternativa.'),
+('FNB','Cartera morosa con seguimiento tardío','El contacto con clientes que se atrasan en sus pagos empieza cuando la deuda ya es antigua.','La mayor parte de la mora se gestiona recién después de 60 días de atraso.','Sube la cartera vencida y la provisión de incobrables.'),
+('Experiencia del Cliente','Demoras en la atención de reclamos','Los reclamos tardan en resolverse y el cliente debe insistir para tener respuesta.','El tiempo de atención de reclamos supera el plazo interno en uno de cada tres casos.','Cae la satisfacción del cliente y aumentan las quejas en entes reguladores.'),
+('Experiencia del Cliente','Respuestas distintas según el canal de atención','Web, teléfono y oficinas entregan información distinta sobre el mismo trámite.','Clientes reportan haber recibido hasta tres respuestas diferentes a una misma consulta.','Genera desconfianza y llamadas repetidas.'),
+('Experiencia del Cliente','Clientes sin información clara del estado de su solicitud','Tras pedir una conexión o servicio, el cliente no sabe en qué etapa está su solicitud.','Gran parte de las llamadas al call center son consultas por el estado del trámite.','Satura los canales de atención y deteriora la experiencia.'),
+('Experiencia del Cliente','Facturas confusas que generan consultas repetidas','El formato de la factura mezcla conceptos y es difícil de entender.','Las consultas sobre cómo leer la factura se repiten cada mes en los canales de atención.','Costos de atención innecesarios y clientes molestos.'),
+('Gestión de personas','Alta rotación de personal clave','Personas con experiencia y conocimiento del negocio se van a otras empresas.','La rotación del último año fue mayor en puestos técnicos y de jefatura.','Se pierde conocimiento, suben los costos de selección y se frenan proyectos.'),
+('Gestión de personas','Falta de planes de desarrollo y línea de carrera','No hay rutas claras de crecimiento ni capacitación alineada a cada puesto.','La encuesta de clima muestra baja percepción de oportunidades de desarrollo.','Baja motivación y menor retención del talento.'),
+('Gestión de personas','Carga laboral desbalanceada entre equipos','Algunos equipos trabajan en sobrecarga mientras otros tienen capacidad disponible.','Las horas extra se concentran en pocas áreas durante los cierres de mes.','Agotamiento, errores y mayor ausentismo.'),
+('Sostenibilidad','Impacto ambiental de las obras sin medición consistente','Las obras se ejecutan sin una medición uniforme de su huella ambiental.','Cada contratista reporta con un formato distinto y no todos reportan.','Dificulta cumplir metas ambientales y responder a auditorías.'),
+('Sostenibilidad','Poca articulación con las comunidades de las zonas de trabajo','El trabajo con comunidades se hace por proyecto y sin un plan común.','Las observaciones de vecinos se atienden por canales distintos y sin registro único.','Genera conflictos sociales que detienen o encarecen las obras.'),
+('Sostenibilidad','Indicadores ESG reportados de forma manual y dispersa','Los datos para reportes ESG se recogen a mano desde varias áreas.','El armado del reporte anual toma varias semanas y requiere correcciones.','Riesgo de errores y poca confianza de inversionistas y evaluadores.'),
+('Operaciones','Retrasos en la ejecución de obras','Las obras se terminan después de la fecha comprometida con el cliente.','Una parte importante de los proyectos del año cerró con retraso frente al cronograma.','Más costos, clientes insatisfechos e ingresos que se postergan.'),
+('Operaciones','Falta de integración entre sistemas','Los sistemas de las áreas no comparten información entre sí.','Los mismos datos se registran dos o tres veces en sistemas distintos.','Duplica el trabajo y produce cifras que no coinciden.'),
+('Operaciones','Procesos internos lentos y burocráticos','Muchos procesos exigen varias firmas y pasos que no agregan valor.','Procesos simples toman semanas por aprobaciones en cadena.','Se pierde agilidad y la gente dedica tiempo a trámites en vez de a resultados.'),
+('Operaciones','Emergencias y fugas atendidas con tiempos altos','El tiempo entre el aviso de una fuga y la llegada de la cuadrilla es mayor al esperado.','En horas punta, el tiempo de llegada supera la meta en varios distritos.','Riesgo para las personas, daño a la imagen y sanciones del regulador.'),
+('Operaciones','Exceso de reportes manuales','Los reportes operativos se arman a mano cada semana.','Los equipos dedican varias horas semanales a copiar datos entre archivos.','Horas perdidas, errores y decisiones con información atrasada.'),
+('Comercial','Conexiones nuevas que demoran en concretarse','Desde que el cliente acepta hasta que se concreta la conexión pasan demasiados días.','Los tiempos reales de conexión superan los comprometidos en la oferta.','Se caen ventas y baja la meta de nuevos clientes.'),
+('Comercial','Falta de seguimiento a prospectos','Los contactos interesados no tienen seguimiento ordenado en el tiempo.','Una parte de los prospectos no recibe una segunda llamada.','Oportunidades de venta que se enfrían.'),
+('Comercial','Metas comerciales poco alineadas con la capacidad operativa','Las metas de venta se fijan sin considerar cuántas conexiones se pueden ejecutar.','Los picos de venta superan la capacidad de las cuadrillas.','Atrasos, reclamos y frustración en los equipos comercial y operativo.'),
+('Seguridad Integral','Daños a la red por terceros durante excavaciones','Las excavaciones de terceros dañan las tuberías de la red.','Se registran incidentes de daños por terceros todos los meses.','Riesgo de accidentes, interrupción del servicio y costos de reparación.'),
+('Seguridad Integral','Cumplimiento desigual de normas de seguridad en contratistas','Los contratistas no siguen las mismas reglas de seguridad en todas las obras.','Las inspecciones encuentran observaciones repetidas en el mismo tipo de trabajo.','Aumenta la probabilidad de accidentes y de sanciones.'),
+('Seguridad Integral','Reporte tardío de incidentes','Los incidentes se informan horas o días después de ocurrir.','Reportes de incidentes llegan al área de Seguridad fuera del plazo establecido.','Se pierde la oportunidad de prevenir y de investigar a tiempo.'),
+('Finanzas','Datos poco confiables para decidir','Las cifras que usan las áreas para decidir cambian según el sistema de donde salen.','En cada cierre se concilian diferencias entre reportes que deberían coincidir.','Decisiones basadas en información dudosa.'),
+('Finanzas','Cierres contables con muchas tareas manuales','El cierre mensual depende de archivos y ajustes manuales.','El cierre toma más días de los previstos por correcciones de último minuto.','Retrasa los reportes de gestión y aumenta el riesgo de error.'),
+('Finanzas','Presupuestos que se desvían sin alertas tempranas','No hay alertas que avisen cuando un gasto se aleja de lo presupuestado.','Las desviaciones se descubren al cierre del mes y no cuando ocurren.','Sobrecostos que ya no se pueden corregir a tiempo.');
 ```
 
 Para cargar los dolores reales más adelante: `delete from public.dolores;` (solo si aún no hay votos) y luego un nuevo `insert`. Si ya hay votos, usa `update public.dolores set activo = false` en los que quieras retirar.
