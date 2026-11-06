@@ -37,6 +37,15 @@ Arriba, siempre visible:
 
 REGLA CLAVE: el ranking NO debe verse ni poder consultarse antes de enviar, para que nadie vote influenciado por los demás. Mientras la persona no ha enviado, solo ve la pantalla de selección (sin pestañas, sin botón de ranking y sin puntos). La tarjeta de participación completada (X de 30) sí puede verse siempre, porque no revela qué dolores van ganando. Esto debe cumplirse también en la base de datos, no solo ocultando botones.
 
+FILTRO POR ÁREA (en la pantalla de selección)
+- Justo DEBAJO de la tarjeta "Participación completada" y encima de la lista de dolores, un bloque "Filtrar por área" con una fila de chips (botones tipo píldora, con salto de línea en celular). Solo aparece en la vista de selección; se oculta al pasar a "Ranking en vivo".
+- Chips: "Todas (30)" y uno por cada área distinta que exista en la columna `area` de la tabla `dolores` (por ejemplo Legal, FNB, Experiencia del Cliente, Gestión de personas, Sostenibilidad, Operaciones, Comercial, Seguridad Integral, Finanzas). Se generan dinámicamente desde los datos, en el orden en que aparecen, y cada chip muestra al lado la cantidad de dolores del área.
+- Selección única: por defecto está activo "Todas". Al tocar un área, la lista muestra solo los dolores de esa área; al tocar otra, cambia; "Todas" vuelve a mostrar todo. El chip activo va relleno azul petróleo (#0B6E99) con texto blanco; los inactivos, blancos con borde #BFE3EC.
+- Arriba a la derecha del bloque, un texto pequeño que dice "Mostrando 3 dolores de Finanzas" o "Mostrando los 30 dolores".
+- Cada chip muestra un pequeño círculo verde con la cantidad de dolores YA MARCADOS en esa área (solo si es mayor a 0; en "Todas" muestra el total marcado). Se actualiza al marcar o desmarcar.
+- El filtro es solo visual: NO cambia la selección. Los dolores marcados siguen marcados al cambiar de área, el contador "X / 8" y el límite de 8 siguen siendo globales (si ya hay 8, los no marcados de cualquier área se ven bloqueados). Cada dolor conserva su número original (por ejemplo, en Finanzas se ven el 28, 29 y 30).
+- Los chips son botones accesibles (role="radio" dentro de un radiogroup, aria-checked, foco visible).
+
 Pantalla de selección (única visible hasta enviar):
 - Lista de todos los dolores (30 de ejemplo, luego serán más). Cada fila muestra número, encima del texto el ÁREA a la que pertenece el dolor en letras pequeñas, mayúsculas y color azul petróleo (ej. "OPERACIONES"), el texto del dolor y a la derecha un botón tipo casilla (checklist) cuadrado, celeste oscuro, con check blanco al marcarse.
 - Se pueden marcar como máximo 8. Al llegar a 8, todas las filas NO marcadas quedan bloqueadas (opacidad baja, cursor not-allowed, sin poder hacer clic). Las marcadas siguen activas: si la persona desmarca una, se desbloquean las demás y puede elegir otra.

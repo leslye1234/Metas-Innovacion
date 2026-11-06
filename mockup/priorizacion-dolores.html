@@ -164,6 +164,20 @@
   #tip dd { margin: 1px 0 0; font-size: 13.5px; line-height: 1.4; }
   #tip .ej { margin-top: 10px; font-size: 11px; color: var(--muted); }
 
+
+  /* Filtro por área */
+  .filter { margin-top: 16px; }
+  .filter-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+  .filter-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #04252f; }
+  .filter-count { font-size: 13px; color: #07323f; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .chip-f { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: 13.5px; cursor: pointer; transition: background .15s, border-color .15s; }
+  .chip-f:hover { border-color: var(--brand); background: var(--soft); }
+  .chip-f[aria-checked="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+  .chip-f .n { font-weight: 500; opacity: .75; font-variant-numeric: tabular-nums; }
+  .chip-f .sel { display: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--win); color: #fff; font-size: 11.5px; font-weight: 700; line-height: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+  .chip-f.has .sel { display: inline-block; }
+
   @media (max-width: 520px) {
     .rrow .meter { display: none; }
     .top h1 { font-size: 20px; }
@@ -209,6 +223,11 @@
       </div>
       <div class="track" role="progressbar" aria-label="Participación" aria-valuemin="0" aria-valuemax="100" id="pTrack"><div class="fill" id="pFill"></div></div>
       <div class="feed" id="feed"></div>
+    </div>
+
+    <div class="filter" id="filterBar">
+      <div class="filter-head"><span class="filter-title">Filtrar por área</span><span class="filter-count" id="filterCount" aria-live="polite"></span></div>
+      <div class="chips" id="chips" role="radiogroup" aria-label="Filtrar dolores por área"></div>
     </div>
 
     <div class="tabs" role="tablist" id="tabs" hidden>
@@ -376,6 +395,7 @@
       full ? "Llegaste a 8. Desmarca uno si quieres cambiar tu elección." :
       "Te faltan " + (MAX - selected.size) + " para poder enviar.";
     $("sentBanner").hidden = !sent;
+    if (typeof applyFilter === "function") applyFilter();
   }
   $("send").addEventListener("click", function () {
     if (sent || selected.size !== MAX) return;
@@ -415,6 +435,33 @@
     });
   }
 
+  /* ---------- Filtro por área ---------- */
+  var areaList = AREAS.filter(function (a, i) { return AREAS.indexOf(a) === i; });
+  var filterArea = "", chipsEl = $("chips");
+  function addChip(value, label, count) {
+    var c = document.createElement("button");
+    c.type = "button"; c.className = "chip-f"; c.setAttribute("role", "radio"); c.dataset.area = value;
+    c.innerHTML = label + ' <span class="n">' + count + '</span><span class="sel" title="Marcados en esta área">0</span>';
+    c.addEventListener("click", function () { filterArea = value; applyFilter(); });
+    chipsEl.appendChild(c);
+  }
+  addChip("", "Todas", DOLORES.length);
+  areaList.forEach(function (a) { addChip(a, a, AREAS.filter(function (x) { return x === a; }).length); });
+  function applyFilter() {
+    var shown = 0;
+    Array.prototype.forEach.call(listEl.children, function (row) {
+      var ok = !filterArea || AREAS[+row.dataset.i] === filterArea;
+      row.hidden = !ok; if (ok) shown++;
+    });
+    $("filterCount").textContent = filterArea ? "Mostrando " + shown + " dolores de " + filterArea : "Mostrando los " + shown + " dolores";
+    Array.prototype.forEach.call(chipsEl.children, function (c) {
+      c.setAttribute("aria-checked", c.dataset.area === filterArea);
+      var n = 0; selected.forEach(function (i) { if (!c.dataset.area || AREAS[i] === c.dataset.area) n++; });
+      c.classList.toggle("has", n > 0); c.querySelector(".sel").textContent = n;
+    });
+    if (tip) tip.classList.remove("show");
+  }
+
   /* ---------- Detalle del dolor ---------- */
   var tip = $("tip"), tipFor = null, tipTimer;
   function showTip(i, anchor) {
@@ -449,13 +496,13 @@
   /* ---------- Pestañas ---------- */
   function showTab(which) {
     var rank = which === "rank";
-    $("viewVote").hidden = rank; $("viewRank").hidden = !rank;
+    $("viewVote").hidden = rank; $("viewRank").hidden = !rank; $("filterBar").hidden = rank;
     $("tabVote").setAttribute("aria-selected", !rank); $("tabRank").setAttribute("aria-selected", rank);
   }
   $("tabVote").addEventListener("click", function () { showTab("vote"); });
   $("tabRank").addEventListener("click", function () { showTab("rank"); });
 
-  $("reset").addEventListener("click", function () { sent = false; $("tabs").hidden = true; selected.clear(); renderSelection(); showTab("vote"); startSim(11); });
+  $("reset").addEventListener("click", function () { filterArea = ""; sent = false; $("tabs").hidden = true; selected.clear(); renderSelection(); showTab("vote"); startSim(11); });
 
   renderSelection();
 })();
