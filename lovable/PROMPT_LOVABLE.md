@@ -180,7 +180,7 @@ create policy "leer dolores" on public.dolores for select using (true);
 create policy "leer participantes" on public.participantes for select using (true);
 create policy "crear participante" on public.participantes for insert with check (completo = false);
 -- votos: sin política de lectura a propósito (nadie puede leerlos directo)
-create policy "leer config" on public.config for select using (true);
+-- config: sin política de lectura; el total esperado se entrega con obtener_avance()
 
 grant execute on function public.enviar_seleccion(uuid, int[]) to anon, authenticated;
 grant execute on function public.obtener_ranking(uuid) to anon, authenticated;
