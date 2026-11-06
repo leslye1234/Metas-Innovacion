@@ -4,9 +4,11 @@ Completa este archivo (o pásame las respuestas por chat) para que el agente `di
 
 > Ya conocido del repositorio (no hace falta repetirlo, solo corrígelo si está mal): programa de afiliación con puntos, canje, sorteos y auspiciadores; ahora acepta cualquier vehículo (antes solo GNV); captación en campo cerca de grifos con el equipo de Marcia; registro por chatbot; pico de conductores de 5 a 9 p.m. (máximo 7 p.m.); barrera principal = desconfianza al dar DNI/teléfono; la página de canje no explica bien premios, sorteos ni auspiciadores.
 
+> **Recibido el 6 de noviembre:** la marca es Socio Conductor, auspiciada por Cálidda. Llegaron los logos (negro y blanco con Cálidda), el personaje Soporte Conductor y un post de referencia. La mecánica es WhatsApp → subir boletas → puntos por combustible, con sorteo los martes a las 12 p.m. Todo está en `guia-marca-socio-conductor.md`.
+
 ---
 
-## 1. Marca ⭐
+## 1. Marca ⭐ (parcialmente recibido)
 - [ ] Nombre de la marca/programa y de la empresa que lo respalda
 - [ ] Logo en alta calidad (PNG con fondo transparente y SVG si hay)
 - [ ] Colores oficiales (códigos HEX) y tipografías
