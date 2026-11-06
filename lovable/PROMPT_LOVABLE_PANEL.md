@@ -53,14 +53,14 @@ MODO EDICIÓN (botón "Modificar ranking")
   * En cada fila que se arrastró muestra un texto pequeño junto al área: "▲ subió de #15" o "▼ bajó de #3" (la posición original por votos).
   * Los puntos nunca cambian al mover filas: son los votos reales.
 - "Guardar orden final": guarda el orden en Supabase con `guardar_orden_final`, sale del modo edición y el estado pasa a "Orden final guardado". Cualquiera que abra el panel después ve ese orden guardado (con los mismos colores) y en tiempo real si se vuelve a guardar. Debe existir "Modificar de nuevo".
-- "Volver al orden por votos": deja las filas en el orden por puntos (sin guardar todavía).
+- "Volver al orden por votos": deja las filas en el orden por puntos y borra las marcas de "movido a mano" (sin guardar todavía).
 - "Cancelar": descarta los cambios hechos desde que se entró al modo edición.
 
 DATOS (Supabase)
 - Ranking: RPC `obtener_panel(p_clave text)`.
 - Avance: RPC `obtener_avance()`.
 - Guardar: RPC `guardar_orden_final(p_clave text, p_orden int[])` (lista de ids de dolores en el orden final, del primero al último).
-- Borrar el orden guardado: RPC `borrar_orden_final(p_clave text)` (para "Volver al orden por votos" si ya estaba guardado y se guarda de nuevo, basta con volver a llamar a guardar).
+- Borrar el orden guardado: RPC `borrar_orden_final(p_clave text)`. Úsala solo si el facilitador quiere quitar el orden guardado y mostrar de nuevo el orden por votos (ofrece un botón secundario "Quitar orden guardado" visible solo cuando ya hay un orden guardado). Para reemplazarlo por otro basta con volver a llamar a `guardar_orden_final`.
 - Tiempo real: suscríbete a cambios de las tablas `participantes` y `orden_final` y vuelve a pedir `obtener_panel` y `obtener_avance`.
 - Si `pos_final` viene con valores, el orden mostrado es ese; si no, el orden es por votos.
 
