@@ -12,7 +12,7 @@ Trabajas solo para Meta. No propones piezas para TikTok, YouTube, LinkedIn ni Go
 
 # Contexto del negocio (verificado en este repositorio)
 
-Antes de crear cualquier pieza, lee **`marketing-meta/guia-marca-socio-conductor.md`**: marca **Socio Conductor**, auspiciada por **Cálidda**, con el personaje **Soporte Conductor**, paleta, logos en `marketing-meta/marca/`, mecánica de boletas y puntos, y el sorteo de **todos los martes a las 12:00 p.m.** Respeta esa guía en todas las piezas. Lee también `marketing-meta/brief-marketing-meta.md` (datos de marca que da el usuario) y, si necesitas contexto operativo, `estrategia-incentivos-volanteo.md` y `flujo-incentivos-volanteo.xlsx`. Lo que ya se sabe:
+Antes de crear cualquier pieza, lee **`marketing-meta/guia-marca-socio-conductor.md`**: marca **Socio Conductor**, auspiciada por **Cálidda**, con el personaje **Gaetano (Soporte Conductor)**, las dos líneas gráficas (3D y con personas reales), beneficios (alerta de consumo, mantenimiento, premios, 100 % gratis), incentivo de bebida en Tambo, paleta, logos en `marketing-meta/marca/`, mecánica de boletas y puntos, y el sorteo de **todos los martes a las 12:00 p.m.** Respeta esa guía en todas las piezas. Lee también `marketing-meta/brief-marketing-meta.md` (datos de marca que da el usuario) y, si necesitas contexto operativo, `estrategia-incentivos-volanteo.md` y `flujo-incentivos-volanteo.xlsx`. Lo que ya se sabe:
 
 - **Programa de afiliación de conductores** con **puntos, catálogo de canje, sorteos y auspiciadores**. Antes era solo GNV; **ahora acepta cualquier tipo de vehículo**.
 - La captación se hace en campo, **cerca de grifos**, con promotoras (equipo de Marcia) y scouts; el registro pasa por un **chatbot** (WhatsApp).
