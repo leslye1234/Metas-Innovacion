@@ -69,7 +69,8 @@ DATOS (Supabase)
 DETALLE DE CADA DOLOR (al pasar el mouse)
 - Al pasar el mouse sobre el texto de un dolor (en la lista de selección y en el ranking) aparece una tarjeta flotante blanca con borde azul petróleo de 2 px, esquinas redondeadas y sombra, de máximo 360 px de ancho. Contiene: el área en letras pequeñas, el título del dolor y tres bloques con su etiqueta en mayúsculas pequeñas: "Definición del dolor", "Evidencia" e "Impacto".
 - Los textos salen de las columnas `definicion`, `evidencia` e `impacto` de la tabla `dolores` (pueden ser texto largo y varían por dolor).
-- Se posiciona debajo de la fila; si no hay espacio abajo, aparece arriba. Nunca se sale de la pantalla. Aparece con un fundido corto y se cierra al sacar el mouse o al hacer scroll.
+- Los textos pueden ser largos (varios párrafos): la tarjeta mide hasta 540 px de ancho, su altura máxima es el 72% de la pantalla con scroll interno, y se queda abierta mientras el mouse esté sobre ella. Respeta los saltos de línea del texto original.
+- Se posiciona debajo de la fila; si no hay espacio abajo, aparece arriba, sin tapar la fila. Nunca se sale de la pantalla. Aparece con un fundido corto y se cierra al sacar el mouse o al hacer scroll.
 - En celular y teclado: junto a cada dolor de la lista hay un pequeño botón circular con una "i". Al tocarlo se abre/cierra la misma tarjeta, SIN marcar ni desmarcar el dolor. Tocar fuera la cierra.
 - Marcar el dolor se hace con clic en cualquier parte de la fila, y se puede usar el teclado (Tab para moverse, Espacio o Enter para marcar).
 
