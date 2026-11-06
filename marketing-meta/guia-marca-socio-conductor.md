@@ -11,7 +11,7 @@ Esta guía sale de los archivos que entregó el equipo, guardados en `marketing-
 | Canal de registro | WhatsApp (chatbot) |
 | Mecánica | 1) Registrarse por WhatsApp → 2) Subir las boletas de combustible a Socio Conductor → 3) Acumular puntos según el combustible que carga |
 | Sorteo | **Semanal, todos los martes a las 12:00 p.m.** ("Cada semana tienes una nueva oportunidad") |
-| Personaje | **Gaetano**, también llamado **"Soporte Conductor"**: conductor peruano en 3D, con bigote, gorra amarilla, camisa blanca, corbata negra y brazos cruzados. Es amable y confiable. Frase de rol: "Gaetano te avisa cuando algo anda mal." |
+| Personaje | **Socio Conductor**: el personaje lleva el mismo nombre que el programa. Es un conductor peruano en 3D, con bigote, gorra amarilla, camisa blanca, corbata negra y brazos cruzados; amable y confiable. Frase de rol: "Socio Conductor te avisa cuando algo anda mal." En piezas de ayuda puede aparecer el rótulo "Soporte Conductor". ⚠️ **No usar el nombre "Gaetano"**: quedó en una versión anterior y ya no es válido. |
 | Beneficios comunicados | Registrar boletas → **te avisamos si tu carro está gastando de más** · **recordatorios de mantenimiento** · **premios por constancia** · **100 % gratis** |
 | Incentivo de registro | **"Regístrate hoy y gana una bebida gratis en Tambo"** [PENDIENTE: confirmar vigencia, condiciones y permiso de uso de la marca Tambo] |
 | Promesa central | "Cuida tu carro y sigue generando ingresos" |
@@ -25,7 +25,8 @@ Esta guía sale de los archivos que entregó el equipo, guardados en `marketing-
 | `marca/personaje-soporte-conductor.webp` | Personaje de medio cuerpo con el texto "SOPORTE CONDUCTOR" |
 | `marca/personaje-avatar-circular.png` | Avatar circular del personaje, para foto de perfil de WhatsApp y Messenger |
 | `marca/post-referencia-sorteo-martes.webp` | Post de referencia sobre el sorteo semanal (línea gráfica 3D) |
-| `marca/post-referencia-con-persona-taxista.jpg` | Post de referencia con una persona real (taxista) y Gaetano en avatar |
+| `marca/post-referencia-con-persona-taxista.jpg` | Post original con persona (dice "Gaetano": **no usar**) |
+| `marca/post-referencia-con-persona-taxista-corregido.jpg` | **Versión corregida**: "Socio Conductor te avisa cuando algo anda mal." |
 
 ## 3. Paleta (aproximada)
 
@@ -57,11 +58,11 @@ Combinaciones que funcionan: blanco sobre grafito, negro sobre amarillo, negro s
 | Línea | Cuándo usarla | Cómo se ve |
 |---|---|---|
 | **A. 3D / gráfica** | Sorteos, anuncios, recordatorios semanales, pasos de "cómo participar" | Objetos 3D (megáfono, mano), fondo urbano nocturno desenfocado, tarjetas grafito y amarillas, franja naranja |
-| **B. Con personas** | Beneficios, testimonios, confianza, captación y reactivación | Foto de un conductor peruano real y sonriente (taxista adulto, camisa blanca) en una calle de Lima con un taxi detrás. Titular en caja amarilla, avatar circular de Gaetano con burbuja negra, tarjeta blanca de beneficios y franja negra inferior con WhatsApp 3D y CTA |
+| **B. Con personas** | Beneficios, testimonios, confianza, captación y reactivación | Foto de un conductor peruano real y sonriente (taxista adulto, camisa blanca) en una calle de Lima con un taxi detrás. Titular en caja amarilla, avatar circular del personaje Socio Conductor con burbuja negra, tarjeta blanca de beneficios y franja negra inferior con WhatsApp 3D y CTA |
 
 Reglas de la línea B:
 - Usar **conductores reales** (con autorización firmada) antes que imágenes generadas con IA. Si se usa IA fotorrealista, Meta puede mostrar la etiqueta "Información de IA", y eso le resta confianza a un público que ya desconfía.
-- Gaetano siempre aparece como avatar o asistente, nunca reemplaza a la persona real.
+- El personaje Socio Conductor siempre aparece como avatar o asistente, nunca reemplaza a la persona real.
 - Mostrar diversidad de conductores: taxi, colectivo, carga ligera, mujer conductora, conductor joven de aplicativo.
 - La fuente del post B parece **Raleway** (Regular + ExtraBold). [PENDIENTE: confirmar si es la fuente oficial o si es Montserrat]
 
@@ -87,7 +88,7 @@ Lo que funciona (es el más fuerte de los dos):
 - La persona real sonriendo genera cercanía y confianza.
 - El beneficio es concreto ("te avisamos si tu carro está gastando de más") y conecta con el bolsillo del conductor.
 - Tiene CTA con WhatsApp y un incentivo inmediato (bebida en Tambo).
-- Gaetano aparece como asistente y el titular habla de ingresos.
+- El personaje aparece como asistente y el titular habla de ingresos.
 
 Lo que mejoraría:
 1. **No aparece el logo de Socio Conductor ni el "Auspiciado por Cálidda".**
@@ -96,6 +97,7 @@ Lo que mejoraría:
 4. El incentivo de Tambo está en la parte de abajo, que en Reels y Stories queda tapada por los botones. Hay que moverlo en la versión 9:16.
 5. Le falta la letra chica: "Válido para nuevos registros, hasta agotar stock, ver condiciones".
 6. Formato 1:1. Hay que hacer versiones 4:5 y 9:16.
+7. ~~Decía "Gaetano te avisa"~~: ya está corregido a "Socio Conductor te avisa" en la versión `-corregido.jpg`.
 
 ## 7. Datos aún pendientes
 
