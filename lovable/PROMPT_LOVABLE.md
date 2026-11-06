@@ -66,6 +66,16 @@ DATOS (Supabase)
 - Para el tiempo real, suscríbete a cambios en `participantes` (cada vez que alguien envía cambia su fila) y vuelve a llamar a `obtener_ranking` y `obtener_avance`.
 - El envío debe ser una sola llamada a la función RPC `enviar_seleccion(p_participante uuid, p_dolores int[])`, que valida que sean exactamente 8 dolores distintos y que el participante no haya enviado antes.
 
+PESTAÑA "Gráfico de resultados" (solo existe después de enviar, junto a "Ranking en vivo")
+- Una tercera pestaña con el texto "Gráfico de resultados", al lado de "Ranking en vivo". Muestra, en gráficos, los 8 dolores priorizados, y se actualiza en tiempo real tanto con cada voto nuevo como cuando el facilitador guarda un orden final por consenso (cambios en las tablas `participantes` y `orden_final`).
+- Arriba, chips de estado: "Participación X de 30", "En vivo" o "Votación completa", y, si hay orden final, "Resultado final por consenso · N cambios" (amarillo).
+- COLORES: VERDE (#1FA463) para los dolores del Top 8 por votación; AMARILLO (#E0A800, fondo #FFF3BF, texto #6B4E00) para los dolores que NO estaban en ese Top 8 y que el facilitador subió al Top 8 por consenso. Leyenda: "Más votados" / "Subió por consenso".
+- Gráfico 1, "Los 8 más votados" (o "Resultado final: los 8 priorizados" si hay orden final): 8 barras horizontales en el orden vigente (por votos, o el orden final si existe). Cada fila: posición, área en letras pequeñas, título del dolor, barra proporcional a los votos sobre el total de participantes y el número de votos. Verde o amarillo según la regla anterior; en los amarillos, el texto "▲ subió de #N" (su posición original por votos). Debajo, si hay orden final, una línea "Salieron del Top 8 por consenso: #7 …, #8 …" con los dolores del Top 8 original que quedaron fuera.
+- Gráfico 2, "Impacto de los 8 priorizados": una barra por dimensión de impacto (Económico/financiero, Cliente, Operativo, Estratégico, Personas y capacidades, Riesgo/cumplimiento, Otras), ordenadas de mayor a menor; cada barra es APILADA: segmento verde con los dolores verdes que tocan esa dimensión y segmento amarillo con los amarillos. A la derecha, el total. Las dimensiones de cada dolor salen de la columna `dimensiones`.
+- Gráfico 3, "Mapa de calor del Top 8": tabla de 8 filas (los dolores) por 7 columnas (las dimensiones). Cada celda de una dimensión que toca el dolor se pinta VERDE si el dolor es verde y AMARILLO si es amarillo; las demás celdas, gris muy claro; si el dolor no tiene dimensiones clasificadas, la fila va en franjas grises. La tabla tiene scroll horizontal en celular.
+- Las barras y los segmentos cambian de ancho con una transición de 0,6 s cuando llegan votos o cambia el orden.
+- También en la pestaña "Ranking en vivo": si hay orden final, las filas siguen ese orden, los dolores que subieron se pintan amarillos con "▲ subió de #N", y los del Top 8 por votación se mantienen en verde. La leyenda incluye "Subió por consenso".
+
 DETALLE DE CADA DOLOR (al pasar el mouse)
 - Al pasar el mouse sobre el texto de un dolor (en la lista de selección y en el ranking) aparece una tarjeta flotante blanca con borde azul petróleo de 2 px, esquinas redondeadas y sombra, de máximo 360 px de ancho. Contiene: el área en letras pequeñas, el título del dolor y tres bloques con su etiqueta en mayúsculas pequeñas: "Definición del dolor", "Evidencia" e "Impacto".
 - Los textos salen de las columnas `definicion`, `evidencia` e `impacto` de la tabla `dolores` (pueden ser texto largo y varían por dolor).
@@ -295,3 +305,44 @@ const ROW_H = 68;
 // cada fila: style={{ transform: `translateY(${index * ROW_H}px)`, transition: "transform .7s" }}
 // verde si index < 8 && puntos > 0
 ```
+
+---
+
+## 5. SQL adicional para el gráfico de resultados
+
+Ejecútalo DESPUÉS del SQL del panel (`PROMPT_LOVABLE_PANEL.md`, sección 2), porque usa la tabla `orden_final`. Reemplaza `obtener_ranking` para que también devuelva las dimensiones de impacto y la posición final.
+
+```sql
+alter table public.dolores add column if not exists dimensiones text[] default '{}';
+alter table public.dolores add column if not exists fuente int;
+
+drop function if exists public.obtener_ranking(uuid);
+create or replace function public.obtener_ranking(p_participante uuid)
+returns table (
+  id int, area text, texto text, definicion text, evidencia text, impacto text,
+  dimensiones text[], puntos int, posicion bigint, pos_final int
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (select 1 from public.participantes where participantes.id = p_participante and completo) then
+    raise exception 'El ranking se habilita después de enviar tu selección';
+  end if;
+  return query
+    select d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto, d.dimensiones,
+           count(v.dolor_id)::int,
+           row_number() over (order by count(v.dolor_id) desc, d.id),
+           (select o.posicion from public.orden_final o where o.dolor_id = d.id)
+    from public.dolores d
+    left join public.votos v on v.dolor_id = d.id
+    where d.activo
+    group by d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto, d.dimensiones
+    order by 9;
+end;
+$$;
+grant execute on function public.obtener_ranking(uuid) to anon, authenticated;
+```
+
+En el frontend: `posicion` es la posición por votos y `pos_final` es la del orden por consenso (puede ser nulo). El Top 8 por votación se congela cuando completaron todos; un dolor es amarillo si no está en ese Top 8, está en el orden final y su `pos_final` es menor que su `posicion`. Para que el panel solo pinte de amarillo lo que el facilitador arrastró, guarda además esa marca (opcional): `alter table public.orden_final add column if not exists movido boolean default false;` y envíala en `guardar_orden_final`.
