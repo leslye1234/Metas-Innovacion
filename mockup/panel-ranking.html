@@ -54,6 +54,8 @@
   .btn.ok { background: var(--win); }
   .btn.ok:hover:not(:disabled) { background: #178650; }
 
+  .rkstat { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; } .rkstat span { background: var(--soft); color: var(--brand-strong); font-weight: 700; font-size: 13px; padding: 5px 12px; border-radius: 999px; font-variant-numeric: tabular-nums; } .rkstat span.hi { background: var(--win-bg); color: var(--win-ink); }
+  .pts { width: 66px !important; } .pts small.avg { white-space: nowrap; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: #07323f; margin: 6px 0 10px; }
   .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 6px; vertical-align: -1px; }
 
@@ -131,8 +133,9 @@
     <button class="btn ghost" id="btnCancel" hidden>Cancelar</button>
   </div>
 
+  <div class="rkstat" id="rkStat"></div>
   <div class="legend">
-    <span><i style="background:var(--win)"></i>Top 8 por votación</span>
+    <span><i style="background:var(--win)"></i>Top 8 por puntaje</span>
     <span><i style="background:var(--boost)"></i>Subió por consenso</span>
     <span><i style="background:var(--rest-bar)"></i>Resto de dolores</span>
   </div>
@@ -197,16 +200,11 @@
   var complete = false, editing = false, saved = false;
   var origPos = [], topSet = {}, order = [], backup = null, moved = {};
 
-  function weightedPick() {
-    var pool = DOLORES.map(function (_, i) { return i; }), out = [];
-    while (out.length < MAX) {
-      var sum = 0; pool.forEach(function (i) { sum += WEIGHT[i]; });
-      var r = Math.random() * sum, acc = 0, pick = pool.length - 1;
-      for (var k = 0; k < pool.length; k++) { acc += WEIGHT[pool[k]]; if (acc >= r) { pick = k; break; } }
-      out.push(pool.splice(pick, 1)[0]);
-    }
-    return out;
+  var WMAX = Math.max.apply(null, WEIGHT);
+  function randomRatings() {
+    return DOLORES.map(function (_, i) { var mean = 1.4 + WEIGHT[i] / WMAX * 3.1; return Math.max(1, Math.min(5, Math.round(mean + (Math.random() - 0.5) * 2.6))); });
   }
+  function addRatings(arr) { arr.forEach(function (p, i) { votes[i] += p; }); }
   function byVotes() {
     return DOLORES.map(function (_, i) { return i; }).sort(function (a, b) { return votes[b] - votes[a] || a - b; });
   }
@@ -216,15 +214,15 @@
     clearInterval(timer);
     votes = DOLORES.map(function () { return 0; }); done = 0; simIdx = 0;
     complete = false; editing = false; saved = false; origPos = []; topSet = {}; backup = null; moved = {};
-    for (var s = 0; s < initial; s++) { weightedPick().forEach(function (i) { votes[i]++; }); done++; simIdx++; }
+    for (var s = 0; s < initial; s++) { addRatings(randomRatings()); done++; simIdx++; }
     $("feed").textContent = "";
     order = byVotes(); render();
     timer = setInterval(step, 1800);
   }
   function step() {
     if (done >= TOTAL) { clearInterval(timer); return; }
-    weightedPick().forEach(function (i) { votes[i]++; }); done++;
-    $("feed").innerHTML = '<span class="dot"></span><b>' + NAMES[simIdx % NAMES.length] + '</b> envió su selección'; simIdx++;
+    addRatings(randomRatings()); done++;
+    $("feed").innerHTML = '<span class="dot"></span><b>' + NAMES[simIdx % NAMES.length] + '</b> envió su calificación'; simIdx++;
     order = byVotes();
     if (done >= TOTAL) { clearInterval(timer); finish(); }
     render();
@@ -240,7 +238,7 @@
   DOLORES.forEach(function (t, i) {
     var r = document.createElement("div"); r.className = "rrow";
     r.innerHTML = '<div class="pos"></div><div class="name"><span class="area">' + AREAS[i] + '<em class="mv"></em></span><span class="txt">' + t + '</span></div>' +
-      '<div class="meter"><span></span></div><div class="pts"><span class="v">0</span><small>puntos</small></div>' +
+      '<div class="meter"><span></span></div><div class="pts"><span class="v">0</span><small class="avg">prom. 0</small></div>' +
       '<div class="ctl"><span class="grip" aria-hidden="true">⋮⋮</span></div>';
     rankEl.appendChild(r); rrows[i] = r;
     bindDrag(r, i);
@@ -257,8 +255,8 @@
     $("statusTxt").textContent = editing ? "Modo edición" : saved ? "Orden final guardado" : complete ? "Votación completa" : "En vivo";
     $("msg").innerHTML = editing ? "<strong>Arrastra cualquier dolor</strong> hacia arriba o abajo y suéltalo en su nueva posición. Los verdes se mantienen; los que suban pasan a amarillo."
       : saved ? "<strong>Orden final guardado.</strong> Todos los que tengan el enlace ven este orden."
-      : complete ? "<strong>Todos completaron su selección.</strong> Ya puedes modificar el ranking según el consenso."
-      : "Esperando a que todas las personas completen sus 8 dolores…";
+      : complete ? "<strong>Todos enviaron su calificación.</strong> Ya puedes modificar el ranking según el consenso."
+      : "Esperando a que todas las personas califiquen los dolores…";
     $("btnEdit").hidden = !complete || editing; $("btnEdit").textContent = saved ? "Modificar de nuevo" : "Modificar ranking";
     $("btnSave").hidden = !editing; $("btnResetOrder").hidden = !editing; $("btnCancel").hidden = !editing;
     rankEl.classList.toggle("editing", editing);
@@ -274,7 +272,8 @@
     mv.textContent = d > 0 ? "▲ subió de #" + (origPos[idx] + 1) : d < 0 ? "▼ bajó de #" + (origPos[idx] + 1) : "";
     r.querySelector(".pos").textContent = pos + 1;
     r.querySelector(".v").textContent = votes[idx];
-    r.querySelector(".meter span").style.width = Math.min(100, votes[idx] / TOTAL * 100) + "%";
+    r.querySelector(".avg").textContent = "prom. " + (done ? (votes[idx] / done).toFixed(1) : "0");
+    r.querySelector(".meter span").style.width = Math.min(100, votes[idx] / (5 * TOTAL) * 100) + "%";
   }
   var dragIdx = null;
   function layout() {
@@ -284,6 +283,8 @@
       r.style.zIndex = DOLORES.length - pos;
       rowState(idx, pos);
     });
+    var mx = Math.max.apply(null, votes), mn = Math.min.apply(null, votes);
+    $("rkStat").innerHTML = '<span class="hi">Mayor puntaje: ' + mx + '</span><span>Menor puntaje: ' + mn + '</span><span>Máximo posible: ' + 5 * TOTAL + ' (' + TOTAL + ' personas × 5)</span>';
   }
 
   /* ---------- Edición ---------- */
@@ -333,7 +334,7 @@
   rrows.forEach(function (r, i) { var n = r.querySelector(".name"); n.addEventListener("mouseenter", function () { if (dragIdx === null) showTip(i, n); }); n.addEventListener("mouseleave", hideTip); });
   addEventListener("scroll", function () { clearTimeout(tipTimer); hideTip(); }, { passive: true });
 
-  $("btnFast").addEventListener("click", function () { while (done < TOTAL) { weightedPick().forEach(function (i) { votes[i]++; }); done++; } clearInterval(timer); finish(); $("feed").innerHTML = '<span class="dot"></span>Todas las personas completaron su selección'; render(); });
+  $("btnFast").addEventListener("click", function () { while (done < TOTAL) { addRatings(randomRatings()); done++; } clearInterval(timer); finish(); $("feed").innerHTML = '<span class="dot"></span>Todas las personas enviaron su calificación'; render(); });
   $("btnReset").addEventListener("click", function () { start(11); });
   start(11);
 })();

@@ -12,15 +12,15 @@ Orden de uso:
 ## 1. Prompt principal (pegar en Lovable)
 
 ```
-Crea una aplicación web en español llamada "Priorización de dolores", con React + TypeScript + Tailwind y Supabase (base de datos + Realtime). Es para que unas 30 personas elijan en tiempo real los dolores más importantes de la compañía.
+Crea una aplicación web en español llamada "Priorización de dolores", con React + TypeScript + Tailwind y Supabase (base de datos + Realtime). Es para que unas 30 personas califiquen en tiempo real, del 1 al 5, los dolores de la compañía, y el ranking sale de la suma de las notas.
 
 DISEÑO
 - Fondo turquesa corporativo de Cálidda (#32C5DB) SOLO en la pantalla de acceso. Una vez que la persona ingresa (selección de dolores y ranking en vivo), el fondo de toda la página pasa a BLANCO (#FFFFFF). En esas pantallas las tarjetas, filas y la barra inferior son blancas con borde fino #BFE3EC (sin sombra), la zona de resumen usa fondo #E8F7FA y el logo de Cálidda del pie se muestra en turquesa (#32C5DB) en vez de blanco (te adjunto las dos versiones). En la pantalla de acceso las tarjetas son blancas con sombra suave y esquinas redondeadas; tarjetas blancas con sombra suave y esquinas redondeadas.
 - La tarjeta "Participación completada" en las pantallas con fondo blanco lleva un borde grueso de 3 px en azul petróleo (#0B6E99) y una sombra suave azulada, para que destaque sobre el resto.
 - Arriba, en lugar del logo, va el título "Sesión de Estrategia" (en blanco y grande sobre la tarjeta de acceso; en pequeño, mayúsculas y azul muy oscuro en la pantalla de la aplicación).
 - El logo de Cálidda (te lo adjunto como imagen, es blanco con fondo transparente) va centrado en la parte INFERIOR de ambas pantallas, a unos 150 px de ancho. Guárdalo como asset del proyecto (src/assets/logo-calidda.png).
-- Color de acción: azul petróleo (#0B6E99, hover #07556F) para botones, pestañas activas y casillas. Textos sobre el fondo turquesa en azul muy oscuro (#04252F).
-- Los 8 dolores con más puntos se resaltan en VERDE (#1FA463 con fondo #E1F5EA). Los demás quedan en blanco con borde gris azulado, sin resaltar.
+- Color de acción: azul petróleo (#0B6E99, hover #07556F) para botones, pestañas activas y botones de calificación. Textos sobre el fondo turquesa en azul muy oscuro (#04252F).
+- Los 8 dolores con mayor puntaje se resaltan en VERDE (#1FA463 con fondo #E1F5EA). Los demás quedan en blanco con borde gris azulado, sin resaltar.
 - Tipografías: "Outfit" para títulos y "Figtree" para texto. 
 - Debe verse bien en celular y en computadora.
 
@@ -32,60 +32,63 @@ PANTALLA 1: ACCESO (sin registro)
 PANTALLA 2: APLICACIÓN (dos pestañas)
 Arriba, siempre visible:
 - Título "Dolores de la compañía" y, a la derecha, el nombre y cargo de quien ingresó.
-- Tarjeta "Participación completada": "X de 30 · N%" con barra de progreso. X es la cantidad de participantes que ya enviaron su selección. 30 es el total esperado (constante configurable en la tabla `config`). La barra pasa a verde al llegar a 100%.
-- Debajo de la barra, una línea con la última persona que envió: "María Quispe envió su selección".
+- Tarjeta "Participación completada": "X de 30 · N%" con barra de progreso. X es la cantidad de participantes que ya enviaron su calificación. 30 es el total esperado (constante configurable en la tabla `config`). La barra pasa a verde al llegar a 100%.
+- Debajo de la barra, una línea con la última persona que envió: "María Quispe envió su calificación".
 
-REGLA CLAVE: el ranking NO debe verse ni poder consultarse antes de enviar, para que nadie vote influenciado por los demás. Mientras la persona no ha enviado, solo ve la pantalla de selección (sin pestañas, sin botón de ranking y sin puntos). La tarjeta de participación completada (X de 30) sí puede verse siempre, porque no revela qué dolores van ganando. Esto debe cumplirse también en la base de datos, no solo ocultando botones.
+REGLA CLAVE: el ranking NO debe verse ni poder consultarse antes de enviar, para que nadie vote influenciado por los demás. Mientras la persona no ha enviado, solo ve la pantalla de calificación (sin pestañas, sin botón de ranking y sin puntajes). La tarjeta de participación completada (X de 30) sí puede verse siempre, porque no revela qué dolores van ganando. Esto debe cumplirse también en la base de datos, no solo ocultando botones.
 
 FILTRO POR ÁREA (en la pantalla de selección)
 - Justo DEBAJO de la tarjeta "Participación completada" y encima de la lista de dolores, una fila con el texto "Filtrar por área" (Outfit, negrita) y, a su lado, un menú DESPLEGABLE (select) de ancho máximo 360 px. Solo aparece en la vista de selección; se oculta al pasar a "Ranking en vivo". NO uses chips ni botones en fila: debe verse limpio y compacto, con una sola línea.
 - Estilo del desplegable: borde de 2 px azul petróleo (#0B6E99), esquinas redondeadas, fondo blanco, texto 14,5 px semibold, flecha (chevron) azul petróleo a la derecha.
 - Opciones: la primera es "Todas las áreas (30)"; después una por cada área distinta que exista en la columna `area` de la tabla `dolores`, ORDENADAS ALFABÉTICAMENTE de la A a la Z (usa localeCompare con "es" e ignora tildes y mayúsculas), por ejemplo: Comercial, Experiencia del Cliente, Finanzas, FNB, Gestión de personas, Legal, Operaciones, Seguridad Integral, Sostenibilidad. Las áreas se generan dinámicamente desde los datos.
-- Cada opción muestra entre paréntesis la cantidad de dolores del área y, si la persona ya marcó dolores en esa área, el texto "· 2 marcados" (se actualiza al marcar o desmarcar). Ejemplo: "Operaciones (5)  ·  2 marcados".
+- Cada opción muestra entre paréntesis la cantidad de dolores del área y, si la persona ya calificó dolores en esa área, el texto "· 2 calificados" (se actualiza al calificar). Ejemplo: "Operaciones (5)  ·  2 calificados".
 - Por defecto está seleccionada "Todas las áreas". Al elegir un área, la lista muestra solo los dolores de esa área. Debajo del desplegable, un texto pequeño: "Mostrando 3 dolores de Finanzas" o "Mostrando los 30 dolores".
-- El filtro es solo visual: NO cambia la selección. Los dolores marcados siguen marcados al cambiar de área, el contador "X / 8" y el límite de 8 siguen siendo globales (si ya hay 8, los no marcados de cualquier área se ven bloqueados). Cada dolor conserva su número original (por ejemplo, en Finanzas se ven el 28, 29 y 30).
+- El filtro es solo visual: NO cambia las calificaciones. Las notas ya puestas se mantienen al cambiar de área y el contador "X / N" (dolores calificados sobre el total) es global. Cada dolor conserva su número original (por ejemplo, en Finanzas se ven el 28, 29 y 30).
 - Usa un `<select>` nativo con estilo (accesible y cómodo en celular), con etiqueta asociada.
 
-Pantalla de selección (única visible hasta enviar):
-- Lista de todos los dolores (30 de ejemplo, luego serán más). Cada fila muestra número, encima del texto el ÁREA a la que pertenece el dolor en letras pequeñas, mayúsculas y color azul petróleo (ej. "OPERACIONES"), el texto del dolor y a la derecha un botón tipo casilla (checklist) cuadrado, celeste oscuro, con check blanco al marcarse.
-- Se pueden marcar como máximo 8. Al llegar a 8, todas las filas NO marcadas quedan bloqueadas (opacidad baja, cursor not-allowed, sin poder hacer clic). Las marcadas siguen activas: si la persona desmarca una, se desbloquean las demás y puede elegir otra.
-- Barra fija abajo con el contador "5 / 8", un mensaje de ayuda ("Te faltan 3 para poder enviar") y el botón "Enviar selección", habilitado solo cuando hay exactamente 8.
-- Al enviar: se guardan los votos, se marca al participante como "completó", se bloquea toda la lista (solo se puede enviar una vez), se muestra el aviso "Tu selección fue enviada" y RECIÉN ENTONCES aparecen las dos pestañas "Mi selección" y "Ranking en vivo", cambiando automáticamente a "Ranking en vivo". Si la persona recarga la página y ya había enviado, entra directo con las pestañas visibles.
+Pantalla de calificación (única visible hasta enviar):
+- MÉTODO: en lugar de marcar 8 dolores, cada persona CALIFICA TODOS los dolores del 1 al 5, donde 5 es el más prioritario y 1 el menos prioritario. Así, a medida que escucha cada dolor en la sesión, le pone su nota. El ranking suma las notas: por ejemplo, si 25 personas ponen 5 a un dolor, ese dolor tiene 5 × 25 = 125 puntos.
+- Arriba de la lista, una franja con la escala: "1 = menos prioritario" a la izquierda y "5 = más prioritario" a la derecha (fondo #E8F7FA, borde #BFE3EC). Debajo del título de la pantalla, un texto corto: "Califica cada dolor del 1 al 5 a medida que lo escuchas. Puedes cambiar una nota las veces que quieras antes de enviar."
+- Lista de todos los dolores (los que estén en la tabla). Cada fila muestra el número, encima del texto el ÁREA en letras pequeñas, mayúsculas y azul petróleo, el texto del dolor, el botón "i" de detalle y, a la derecha, CINCO botones cuadrados con los números 1, 2, 3, 4 y 5 (38 px, borde de 2 px azul petróleo, fondo blanco). El botón de la nota elegida se rellena de azul petróleo con el número en blanco. Tocar de nuevo la nota elegida la quita. Las filas ya calificadas se ven con fondo #E8F7FA y borde azul petróleo. En celular, los cinco botones pasan debajo del texto, repartidos a todo el ancho.
+- No hay límite de 8 ni bloqueos: todos los dolores se califican. La persona puede cambiar cualquier nota antes de enviar.
+- Barra fija abajo con el contador "X / N" (dolores calificados sobre el total), un mensaje de ayuda ("Te faltan 5 dolores por calificar" o "Listo: ya puedes enviar tu calificación") y el botón "Enviar calificación", habilitado solo cuando TODOS los dolores tienen nota.
+- Al enviar: se guardan las notas (una por dolor), se marca al participante como "completó", se bloquean los botones (solo se puede enviar una vez), se muestra el aviso "Tu calificación fue enviada" y RECIÉN ENTONCES aparecen las tres pestañas "Mi calificación", "Ranking en vivo" y "Gráfico de resultados", cambiando automáticamente a "Ranking en vivo". Si la persona recarga la página y ya había enviado, entra directo con las pestañas visibles.
 
 Pestaña "Ranking en vivo" (solo existe después de enviar):
-- Lista de TODOS los dolores ordenados de mayor a menor cantidad de puntos. Los puntos son cuántas personas lo marcaron (si 30 lo marcaron, tiene 30; si 15, tiene 15).
-- Cada fila: posición, el área en letras pequeñas arriba del texto del dolor (igual que en la selección), el texto, una barrita proporcional (puntos / total esperado) y los puntos a la derecha en grande.
+- Lista de TODOS los dolores ordenados de mayor a menor PUNTAJE. El puntaje de un dolor es la SUMA de las notas (1 a 5) que le pusieron todas las personas que ya enviaron. El máximo posible es 5 × total de personas (por ejemplo 150 con 30 personas).
+- Sobre la lista, una fila de chips con los estadísticos del momento: "Mayor puntaje: 135" (verde claro), "Menor puntaje: 63", "Máximo posible: 150 (30 personas × 5)" y "Calificaron: 30 de 30".
+- Cada fila: posición, el área en letras pequeñas arriba del texto del dolor, el texto, una barrita proporcional (puntaje / (5 × total esperado)) y a la derecha el PUNTAJE en grande con, debajo en letra pequeña, el promedio ("prom. 4.3" = puntaje / personas que ya enviaron, con un decimal).
 - Los 8 primeros llevan el estilo verde. Cuando un dolor sube al top 8, toma el verde; el que sale del top 8 pierde el verde.
-- Cuando cambian los puntos, las filas se reordenan con una animación suave (usar transform translateY con transición, filas de altura fija). El empate se desempata por número de dolor.
-- Se actualiza en tiempo real con Supabase Realtime sin recargar la página: suscríbete a cambios en `votos` y `participantes` y vuelve a calcular.
+- Cuando cambian los puntajes, las filas se reordenan con una animación suave (usar transform translateY con transición, filas de altura fija). El empate se desempata por número de dolor.
+- Se actualiza en tiempo real con Supabase Realtime sin recargar la página: suscríbete a cambios en `participantes` (cada vez que alguien envía) y vuelve a pedir el ranking.
 - Leyenda: verde = "Top 8 priorizados", gris azulado = "Fuera del top 8".
 
 DATOS (Supabase)
-- Usa las tablas del SQL que te voy a pasar: `dolores`, `participantes`, `votos`, `config`.
-- NO leas `votos` desde el frontend. El ranking se pide con la función RPC `obtener_ranking(p_participante uuid)`, que solo responde si ese participante ya envió. El avance se pide con `obtener_avance()`.
+- Usa las tablas del SQL que te voy a pasar: `dolores`, `participantes`, `calificaciones`, `config`.
+- NO leas `calificaciones` desde el frontend. El ranking se pide con la función RPC `obtener_ranking(p_participante uuid)`, que solo responde si ese participante ya envió. El avance se pide con `obtener_avance()`.
 - Para el tiempo real, suscríbete a cambios en `participantes` (cada vez que alguien envía cambia su fila) y vuelve a llamar a `obtener_ranking` y `obtener_avance`.
-- El envío debe ser una sola llamada a la función RPC `enviar_seleccion(p_participante uuid, p_dolores int[])`, que valida que sean exactamente 8 dolores distintos y que el participante no haya enviado antes.
+- El envío debe ser una sola llamada a la función RPC `enviar_calificaciones(p_participante uuid, p_dolores int[], p_puntajes int[])`, que valida que se califiquen TODOS los dolores activos exactamente una vez, con notas de 1 a 5, y que el participante no haya enviado antes.
 
 PESTAÑA "Gráfico de resultados" (solo existe después de enviar, junto a "Ranking en vivo")
-- Una tercera pestaña con el texto "Gráfico de resultados", al lado de "Ranking en vivo". Muestra en gráficos los 8 dolores más votados y se actualiza en tiempo real con cada voto nuevo y cuando el facilitador guarda un orden final por consenso (cambios en las tablas `participantes` y `orden_final`).
-- Arriba, chips de estado: "Participación X de 30", "En vivo" o "Votación completa" y, si hay consenso, "Consenso · se suman N dolores" (amarillo). Leyenda: verde = "Más votados", amarillo = "Se suma por consenso".
-- COLORES: VERDE (#1FA463) para los 8 dolores más votados. AMARILLO (#E0A800, fondo #FFF3BF, texto #6B4E00) para los dolores que NO estaban en esos 8 y que el facilitador arrastró hacia arriba en el panel (su posición final es mejor que la que tenían por votos). Los amarillos se SUMAN a los 8 verdes: los verdes nunca desaparecen ni cambian de color.
-- Gráfico 1, "Dolores por área": una barra horizontal por área, ordenadas de mayor a menor, con la cantidad de dolores de esa área entre los 8 más votados. La barra es APILADA: segmento verde (dolores más votados) y segmento amarillo (dolores sumados por consenso), con el total a la derecha. Antes del consenso solo hay verde.
-- Gráfico 2, "Mapa de calor del Top 8": tabla con una fila por dolor y 7 columnas de dimensiones de impacto (Económico/financiero, Cliente, Operativo, Estratégico, Personas y capacidades, Riesgo/cumplimiento, Otras; las dimensiones salen de la columna `dimensiones`). Primero las 8 filas de los más votados, numeradas 1 a 8; si hay consenso, debajo se agregan las filas amarillas con el signo "+" en lugar de número. Cada celda de una dimensión que toca el dolor se pinta VERDE en las filas verdes y AMARILLA en las filas amarillas; las demás celdas, gris muy claro; si el dolor no tiene dimensiones clasificadas, la fila va en franjas grises.
+- Una tercera pestaña con el texto "Gráfico de resultados", al lado de "Ranking en vivo". Muestra en gráficos los 8 dolores con mayor puntaje y se actualiza en tiempo real con cada calificación nueva y cuando el facilitador guarda un orden final por consenso (cambios en las tablas `participantes` y `orden_final`).
+- Arriba, chips de estado: "Participación X de 30", "En vivo" o "Votación completa" y, si hay consenso, "Consenso · se suman N dolores" (amarillo). Leyenda: verde = "Mayor puntaje", amarillo = "Se suma por consenso".
+- COLORES: VERDE (#1FA463) para los 8 dolores con mayor puntaje. AMARILLO (#E0A800, fondo #FFF3BF, texto #6B4E00) para los dolores que NO estaban en esos 8 y que el facilitador arrastró hacia arriba en el panel (su posición final es mejor que la que tenían por puntaje). Los amarillos se SUMAN a los 8 verdes: los verdes nunca desaparecen ni cambian de color.
+- Gráfico 1, "Dolores por área": una barra horizontal por área, ordenadas de mayor a menor, con la cantidad de dolores de esa área entre los 8 de mayor puntaje. La barra es APILADA: segmento verde (dolores de mayor puntaje) y segmento amarillo (dolores sumados por consenso), con el total a la derecha. Antes del consenso solo hay verde.
+- Gráfico 2, "Mapa de calor del Top 8": tabla con una fila por dolor y 7 columnas de dimensiones de impacto (Económico/financiero, Cliente, Operativo, Estratégico, Personas y capacidades, Riesgo/cumplimiento, Otras; las dimensiones salen de la columna `dimensiones`). Primero las 8 filas de mayor puntaje, numeradas 1 a 8; si hay consenso, debajo se agregan las filas amarillas con el signo "+" en lugar de número. Cada celda de una dimensión que toca el dolor se pinta VERDE en las filas verdes y AMARILLA en las filas amarillas; las demás celdas, gris muy claro; si el dolor no tiene dimensiones clasificadas, la fila va en franjas grises.
 - Al final del mapa de calor, una fila "Total" con un número grande por columna: cuántos dolores (verdes + amarillos) tocan esa dimensión. Si hay amarillos, debajo del número una línea pequeña "4 + 2" (verdes + amarillos). El número suma las celdas pintadas de la columna.
-- NO incluyas otros gráficos (ni el de barras de votos por dolor ni el de impacto por dimensión).
-- Las barras cambian de ancho con una transición de 0,6 s cuando llegan votos o cambia el orden. La tabla del mapa de calor tiene scroll horizontal en celular.
-- También en la pestaña "Ranking en vivo": si hay orden final, las filas siguen ese orden, los dolores sumados se pintan amarillos con "▲ subió de #N", y los 8 originales siguen en verde. La leyenda incluye "Subió por consenso".
+- NO incluyas otros gráficos (ni el de barras de puntaje por dolor ni el de impacto por dimensión).
+- Las barras cambian de ancho con una transición de 0,6 s cuando llegan calificaciones o cambia el orden. La tabla del mapa de calor tiene scroll horizontal en celular.
+- También en la pestaña "Ranking en vivo": si hay orden final, las filas siguen ese orden, los dolores sumados se pintan amarillos con "▲ subió de #N", y los 8 originales siguen en verde. La leyenda incluye "Subió por consenso". Los chips de estadísticos (mayor, menor y máximo posible) siguen visibles.
 
 DETALLE DE CADA DOLOR (al pasar el mouse)
 - Al pasar el mouse sobre el texto de un dolor (en la lista de selección y en el ranking) aparece una tarjeta flotante blanca con borde azul petróleo de 2 px, esquinas redondeadas y sombra, de máximo 360 px de ancho. Contiene: el área en letras pequeñas, el título del dolor y tres bloques con su etiqueta en mayúsculas pequeñas: "Definición del dolor", "Evidencia" e "Impacto".
 - Los textos salen de las columnas `definicion`, `evidencia` e `impacto` de la tabla `dolores` (pueden ser texto largo y varían por dolor).
 - Los textos pueden ser largos (varios párrafos): la tarjeta mide hasta 540 px de ancho, su altura máxima es el 72% de la pantalla con scroll interno, y se queda abierta mientras el mouse esté sobre ella. Respeta los saltos de línea del texto original.
 - Se posiciona debajo de la fila; si no hay espacio abajo, aparece arriba, sin tapar la fila. Nunca se sale de la pantalla. Aparece con un fundido corto y se cierra al sacar el mouse o al hacer scroll.
-- En celular y teclado: junto a cada dolor de la lista hay un pequeño botón circular con una "i". Al tocarlo se abre/cierra la misma tarjeta, SIN marcar ni desmarcar el dolor. Tocar fuera la cierra.
-- Marcar el dolor se hace con clic en cualquier parte de la fila, y se puede usar el teclado (Tab para moverse, Espacio o Enter para marcar).
+- En celular y teclado: junto a cada dolor de la lista hay un pequeño botón circular con una "i". Al tocarlo se abre/cierra la misma tarjeta, SIN cambiar ninguna nota. Tocar fuera la cierra.
+- Las notas se ponen con los cinco botones de cada fila; se pueden usar con el teclado (Tab para moverse, Espacio o Enter para elegir la nota).
 
-Accesibilidad: botones con role="checkbox" y aria-checked, foco visible, contraste suficiente.
+Accesibilidad: los cinco botones de cada dolor forman un grupo (role="radiogroup") con aria-pressed, foco visible, contraste suficiente.
 ```
 
 ---
@@ -114,45 +117,50 @@ create table public.participantes (
   creado_en timestamptz not null default now()
 );
 
--- Un voto = un dolor marcado por un participante (máx. 8 por persona)
-create table public.votos (
+-- Una calificación = la nota (1 a 5) que un participante le pone a un dolor
+-- 5 = más prioritario, 1 = menos prioritario
+create table public.calificaciones (
   participante_id uuid not null references public.participantes(id) on delete cascade,
   dolor_id int not null references public.dolores(id) on delete cascade,
+  puntaje smallint not null check (puntaje between 1 and 5),
   creado_en timestamptz not null default now(),
   primary key (participante_id, dolor_id)
 );
 
--- Total esperado de participantes y máximo de selecciones
+-- Total esperado de participantes y nota máxima
 create table public.config (
   id int primary key default 1 check (id = 1),
   total_esperado int not null default 30,
-  max_selecciones int not null default 8
+  puntaje_max int not null default 5
 );
 insert into public.config default values;
 
--- Ranking: SOLO lo entrega a quien ya envió su selección (evita el sesgo)
+-- Ranking: SOLO lo entrega a quien ya envió su calificación (evita el sesgo)
+-- puntos = suma de las notas; promedio = puntos / personas que ya enviaron
 create or replace function public.obtener_ranking(p_participante uuid)
-returns table (id int, area text, texto text, definicion text, evidencia text, impacto text, puntos int, posicion bigint)
+returns table (id int, area text, texto text, definicion text, evidencia text, impacto text, puntos int, promedio numeric, posicion bigint)
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
   if not exists (select 1 from public.participantes where participantes.id = p_participante and completo) then
-    raise exception 'El ranking se habilita después de enviar tu selección';
+    raise exception 'El ranking se habilita después de enviar tu calificación';
   end if;
   return query
-    select d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto, count(v.dolor_id)::int,
-           row_number() over (order by count(v.dolor_id) desc, d.id)
+    select d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto,
+           coalesce(sum(c.puntaje), 0)::int,
+           round(coalesce(avg(c.puntaje), 0), 1),
+           row_number() over (order by coalesce(sum(c.puntaje), 0) desc, d.id)
     from public.dolores d
-    left join public.votos v on v.dolor_id = d.id
+    left join public.calificaciones c on c.dolor_id = d.id
     where d.activo
     group by d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto
-    order by 8;
+    order by 9;
 end;
 $$;
 
--- Avance general (no revela votos): cuántos completaron y cuántos se esperan
+-- Avance general (no revela calificaciones): cuántos completaron y cuántos se esperan
 create or replace function public.obtener_avance()
 returns table (completaron int, total_esperado int)
 language sql
@@ -163,51 +171,57 @@ as $$
          (select c.total_esperado from public.config c where c.id = 1);
 $$;
 
--- Envío atómico y validado de la selección
-create or replace function public.enviar_seleccion(p_participante uuid, p_dolores int[])
+-- Envío atómico y validado de la calificación: todos los dolores activos, una nota de 1 a 5 cada uno
+create or replace function public.enviar_calificaciones(p_participante uuid, p_dolores int[], p_puntajes int[])
 returns void
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_max int;
+  v_activos int;
 begin
-  select max_selecciones into v_max from public.config where id = 1;
+  select count(*) into v_activos from public.dolores where activo;
 
-  if (select count(distinct x) from unnest(p_dolores) x) <> v_max
-     or array_length(p_dolores, 1) <> v_max then
-    raise exception 'Debes elegir exactamente % dolores distintos', v_max;
+  if array_length(p_dolores, 1) is distinct from v_activos
+     or array_length(p_puntajes, 1) is distinct from v_activos
+     or (select count(distinct x) from unnest(p_dolores) x) <> v_activos
+     or exists (select 1 from unnest(p_dolores) x where x not in (select id from public.dolores where activo)) then
+    raise exception 'Debes calificar los % dolores, una vez cada uno', v_activos;
+  end if;
+
+  if exists (select 1 from unnest(p_puntajes) x where x is null or x < 1 or x > 5) then
+    raise exception 'Las notas deben estar entre 1 y 5';
   end if;
 
   if not exists (select 1 from public.participantes where id = p_participante and not completo) then
-    raise exception 'Participante no existe o ya envió su selección';
+    raise exception 'Participante no existe o ya envió su calificación';
   end if;
 
-  insert into public.votos (participante_id, dolor_id)
-  select p_participante, unnest(p_dolores);
+  insert into public.calificaciones (participante_id, dolor_id, puntaje)
+  select p_participante, d, p from unnest(p_dolores, p_puntajes) as t(d, p);
 
   update public.participantes set completo = true, enviado_en = now() where id = p_participante;
 end;
 $$;
 
--- Seguridad (RLS): los votos solo se leen a través de obtener_ranking
+-- Seguridad (RLS): las calificaciones solo se leen a través de obtener_ranking
 alter table public.dolores enable row level security;
 alter table public.participantes enable row level security;
-alter table public.votos enable row level security;
+alter table public.calificaciones enable row level security;
 alter table public.config enable row level security;
 
 create policy "leer dolores" on public.dolores for select using (true);
 create policy "leer participantes" on public.participantes for select using (true);
 create policy "crear participante" on public.participantes for insert with check (completo = false);
--- votos: sin política de lectura a propósito (nadie puede leerlos directo)
+-- calificaciones: sin política de lectura a propósito (nadie puede leerlas directo)
 -- config: sin política de lectura; el total esperado se entrega con obtener_avance()
 
-grant execute on function public.enviar_seleccion(uuid, int[]) to anon, authenticated;
+grant execute on function public.enviar_calificaciones(uuid, int[], int[]) to anon, authenticated;
 grant execute on function public.obtener_ranking(uuid) to anon, authenticated;
 grant execute on function public.obtener_avance() to anon, authenticated;
 
--- Tiempo real: solo en participantes (no expone votos)
+-- Tiempo real: solo en participantes (no expone calificaciones)
 alter publication supabase_realtime add table public.participantes;
 ```
 
@@ -255,7 +269,7 @@ insert into public.dolores (area, texto, definicion, evidencia, impacto) values
 ('Finanzas','Presupuestos que se desvían sin alertas tempranas','No hay alertas que avisen cuando un gasto se aleja de lo presupuestado.','Las desviaciones se descubren al cierre del mes y no cuando ocurren.','Sobrecostos que ya no se pueden corregir a tiempo.');
 ```
 
-Para cargar los dolores reales más adelante: `delete from public.dolores;` (solo si aún no hay votos) y luego un nuevo `insert`. Si ya hay votos, usa `update public.dolores set activo = false` en los que quieras retirar.
+Para cargar los dolores reales más adelante: `delete from public.dolores;` (solo si aún no hay calificaciones) y luego un nuevo `insert`. Si ya hay calificaciones, usa `update public.dolores set activo = false` en los que quieras retirar.
 
 ---
 
@@ -264,22 +278,18 @@ Para cargar los dolores reales más adelante: `delete from public.dolores;` (sol
 Si Lovable no implementa algo como se pidió, pega este fragmento y dile "usa esta lógica".
 
 ```ts
-// Selección: máximo 8, bloqueo de no marcados, desmarcar permitido
-const MAX = 8;
-const [selected, setSelected] = useState<Set<number>>(new Set());
-const toggle = (id: number) =>
-  setSelected(prev => {
-    const next = new Set(prev);
-    if (next.has(id)) next.delete(id);
-    else if (next.size < MAX) next.add(id);
-    return next;
-  });
-const isLocked = (id: number) => selected.size >= MAX && !selected.has(id);
+// Calificación: una nota de 1 a 5 por dolor; tocar la misma nota otra vez la quita
+const [notas, setNotas] = useState<Record<number, number>>({});
+const poner = (id: number, p: number) =>
+  setNotas(prev => ({ ...prev, [id]: prev[id] === p ? 0 : p }));
+const calificados = dolores.filter(d => notas[d.id] > 0).length;
+const puedeEnviar = calificados === dolores.length;
 
-// Envío
-await supabase.rpc("enviar_seleccion", {
+// Envío (todos los dolores, una sola llamada)
+await supabase.rpc("enviar_calificaciones", {
   p_participante: participanteId,
-  p_dolores: Array.from(selected),
+  p_dolores: dolores.map(d => d.id),
+  p_puntajes: dolores.map(d => notas[d.id]),
 });
 
 // Ranking en tiempo real (solo si ya envió; la BD lo exige igual)
@@ -301,8 +311,14 @@ useEffect(() => {
 
 // Pestañas: solo se muestran cuando yaEnvio === true
 
+// Estadísticos sobre la lista: mayor, menor y máximo posible
+const mayor = Math.max(...ranking.map(r => r.puntos));
+const menor = Math.min(...ranking.map(r => r.puntos));
+const maximoPosible = 5 * totalEsperado;          // p. ej. 150 con 30 personas
+// barra de cada fila: ancho = puntos / maximoPosible; promedio = r.promedio
+
 // Top 8 y animación de reordenado (filas de altura fija = ROW_H)
-const ROW_H = 68;
+const ROW_H = 74;
 // cada fila: style={{ transform: `translateY(${index * ROW_H}px)`, transition: "transform .7s" }}
 // verde si index < 8 && puntos > 0
 ```
@@ -311,7 +327,7 @@ const ROW_H = 68;
 
 ## 5. SQL adicional para el gráfico de resultados
 
-Ejecútalo DESPUÉS del SQL del panel (`PROMPT_LOVABLE_PANEL.md`, sección 2), porque usa la tabla `orden_final`. Reemplaza `obtener_ranking` para que también devuelva las dimensiones de impacto y la posición final.
+Ejecútalo DESPUÉS del SQL del panel (`PROMPT_LOVABLE_PANEL.md`, sección 2), porque usa la tabla `orden_final`. Reemplaza `obtener_ranking` para que también devuelva el promedio, las dimensiones de impacto y la posición final.
 
 ```sql
 alter table public.dolores add column if not exists dimensiones text[] default '{}';
@@ -321,7 +337,7 @@ drop function if exists public.obtener_ranking(uuid);
 create or replace function public.obtener_ranking(p_participante uuid)
 returns table (
   id int, area text, texto text, definicion text, evidencia text, impacto text,
-  dimensiones text[], puntos int, posicion bigint, pos_final int
+  dimensiones text[], puntos int, promedio numeric, posicion bigint, pos_final int
 )
 language plpgsql
 security definer
@@ -329,21 +345,22 @@ set search_path = public
 as $$
 begin
   if not exists (select 1 from public.participantes where participantes.id = p_participante and completo) then
-    raise exception 'El ranking se habilita después de enviar tu selección';
+    raise exception 'El ranking se habilita después de enviar tu calificación';
   end if;
   return query
     select d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto, d.dimensiones,
-           count(v.dolor_id)::int,
-           row_number() over (order by count(v.dolor_id) desc, d.id),
+           coalesce(sum(c.puntaje), 0)::int,
+           round(coalesce(avg(c.puntaje), 0), 1),
+           row_number() over (order by coalesce(sum(c.puntaje), 0) desc, d.id),
            (select o.posicion from public.orden_final o where o.dolor_id = d.id)
     from public.dolores d
-    left join public.votos v on v.dolor_id = d.id
+    left join public.calificaciones c on c.dolor_id = d.id
     where d.activo
     group by d.id, d.area, d.texto, d.definicion, d.evidencia, d.impacto, d.dimensiones
-    order by 9;
+    order by 10;
 end;
 $$;
 grant execute on function public.obtener_ranking(uuid) to anon, authenticated;
 ```
 
-En el frontend: `posicion` es la posición por votos y `pos_final` es la del orden por consenso (puede ser nulo). El Top 8 por votación se congela cuando completaron todos; un dolor es amarillo si no está en ese Top 8, está en el orden final y su `pos_final` es menor que su `posicion`. Para que el panel solo pinte de amarillo lo que el facilitador arrastró, guarda además esa marca (opcional): `alter table public.orden_final add column if not exists movido boolean default false;` y envíala en `guardar_orden_final`.
+En el frontend: `posicion` es la posición por puntaje y `pos_final` es la del orden por consenso (puede ser nulo). El Top 8 por puntaje se congela cuando completaron todos; un dolor es amarillo si no está en ese Top 8, está en el orden final y su `pos_final` es menor que su `posicion`. Para que el panel solo pinte de amarillo lo que el facilitador arrastró, guarda además esa marca (opcional): `alter table public.orden_final add column if not exists movido boolean default false;` y envíala en `guardar_orden_final`.

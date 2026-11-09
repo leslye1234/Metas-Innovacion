@@ -100,6 +100,16 @@
   .row[aria-checked="true"] .box { background: var(--brand); }
   .row[aria-checked="true"] .box svg { opacity: 1; transform: none; color: var(--brand-ink); }
   .row.locked { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .row.rated { border-color: var(--brand); background: var(--soft); }
+  .rate { flex: none; display: flex; gap: 6px; }
+  .rate button { width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--brand); background: var(--surface); color: var(--brand); font: 700 16px var(--font-display); cursor: pointer; transition: background .12s, color .12s; }
+  .rate button:hover:not(:disabled) { background: var(--soft); }
+  .rate button[aria-pressed="true"] { background: var(--brand); color: var(--brand-ink); }
+  .rate button:disabled { cursor: not-allowed; opacity: .6; }
+  .scale { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; font-size: 13px; color: #07323f; margin: 0 0 10px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--soft); }
+  .rkstat { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; } .rkstat span { background: var(--soft); color: var(--brand-strong); font-weight: 700; font-size: 13px; padding: 5px 12px; border-radius: 999px; font-variant-numeric: tabular-nums; } .rkstat span.hi { background: var(--win-bg); color: var(--win-ink); }
+  .pts small.avg { white-space: nowrap; }
+  @media (max-width: 640px) { .row { flex-wrap: wrap; } .row .t { flex-basis: calc(100% - 100px); } .rate { width: 100%; justify-content: space-between; } .rate button { flex: 1; width: auto; } }
 
   .bar { position: sticky; bottom: 0; margin-top: 14px; padding: 12px 14px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     background: var(--surface); border-radius: 14px; box-shadow: 0 -2px 18px rgba(15, 42, 61, .15); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
@@ -231,23 +241,25 @@
     </div>
 
     <div class="tabs" role="tablist" id="tabs" hidden>
-      <button class="tab" role="tab" id="tabVote" aria-selected="true" aria-controls="viewVote">Mi selección</button>
+      <button class="tab" role="tab" id="tabVote" aria-selected="true" aria-controls="viewVote">Mi calificación</button>
       <button class="tab" role="tab" id="tabRank" aria-selected="false" aria-controls="viewRank">Ranking en vivo</button>
     </div>
 
     <div id="viewVote" role="tabpanel">
-      <div id="sentBanner" class="sent-banner" hidden>Tu selección fue enviada. Ya puedes ver el ranking en la pestaña “Ranking en vivo”.</div>
-      <p class="lead">Marca hasta <strong>8 dolores</strong>. Al llegar a 8, los demás se bloquean. Puedes desmarcar uno para elegir otro antes de enviar.</p>
+      <div id="sentBanner" class="sent-banner" hidden>Tu calificación fue enviada. Ya puedes ver el ranking en la pestaña “Ranking en vivo”.</div>
+      <p class="lead">Califica <strong>cada dolor del 1 al 5</strong> a medida que lo escuchas. Puedes cambiar una nota las veces que quieras antes de enviar.</p>
+      <div class="scale"><span><b>1</b> = menos prioritario</span><span><b>5</b> = más prioritario</span></div>
       <div class="list" id="list"></div>
       <div class="bar">
-        <div class="count"><span id="cnt">0</span> / 8</div>
-        <div class="hint" id="hint">Selecciona 8 dolores para enviar.</div>
-        <button class="btn" id="send" disabled>Enviar selección</button>
+        <div class="count"><span id="cnt">0</span> / <span id="cntTotal">0</span></div>
+        <div class="hint" id="hint">Califica todos los dolores para enviar.</div>
+        <button class="btn" id="send" disabled>Enviar calificación</button>
       </div>
     </div>
 
     <div id="viewRank" role="tabpanel" hidden>
-      <p class="lead">Los <strong>8 primeros</strong> se resaltan en verde y cambian cada vez que alguien envía su selección. Los puntos son la cantidad de personas que marcaron cada dolor.</p>
+      <p class="lead">Los <strong>8 con mayor puntaje</strong> se resaltan en verde y cambian cada vez que alguien envía su calificación. El puntaje de cada dolor es la <strong>suma de las notas de 1 a 5</strong> de todas las personas.</p>
+      <div class="rkstat" id="rkStat"></div>
       <div class="legend">
         <span><i style="background:var(--win)"></i>Top 8 priorizados</span>
         <span><i style="background:var(--rest-bar)"></i>Fuera del top 8</span>
@@ -311,38 +323,34 @@
   var WEIGHT = DOLORES.map(function (_, i) { return [9, 7, 8, 8, 6, 2, 6, 4, 5, 7, 4, 7, 6, 2, 1, 5, 6, 4, 3, 1, 3, 6, 3, 2, 5, 3, 4, 2, 2, 7][i] || 1; });
 
   var $ = function (id) { return document.getElementById(id); };
-  var user = null, selected = new Set(), sent = false;
+  var user = null, ratings = DOLORES.map(function () { return 0; }), sent = false;
   var votes, done, timer, simIdx;
 
-  function weightedPick() {
-    var pool = DOLORES.map(function (_, i) { return i; }), out = [];
-    while (out.length < MAX) {
-      var sum = 0; pool.forEach(function (i) { sum += WEIGHT[i]; });
-      var r = Math.random() * sum, acc = 0, pick = pool.length - 1;
-      for (var k = 0; k < pool.length; k++) { acc += WEIGHT[pool[k]]; if (acc >= r) { pick = k; break; } }
-      out.push(pool.splice(pick, 1)[0]);
-    }
-    return out;
+  // Calificaciones simuladas de otra persona: una nota de 1 a 5 por dolor, con dolores claramente más fuertes que otros.
+  var WMAX = Math.max.apply(null, WEIGHT);
+  function randomRatings() {
+    return DOLORES.map(function (_, i) { var mean = 1.4 + WEIGHT[i] / WMAX * 3.1; return Math.max(1, Math.min(5, Math.round(mean + (Math.random() - 0.5) * 2.6))); });
   }
+  function addRatings(arr) { arr.forEach(function (p, i) { votes[i] += p; }); }
 
   function submitVotes(arr, who, cargo) {
-    arr.forEach(function (i) { votes[i]++; });
+    addRatings(arr);
     done++;
-    $("feed").innerHTML = '<span class="dot"></span><b>' + who + '</b> envió su selección' + (cargo ? ' (' + cargo + ')' : '');
+    $("feed").innerHTML = '<span class="dot"></span><b>' + who + '</b> envió su calificación' + (cargo ? ' (' + cargo + ')' : '');
     renderProgress(); renderRank();
   }
 
   function startSim(initial) {
     clearInterval(timer);
     votes = DOLORES.map(function () { return 0; }); done = 0; simIdx = 0;
-    for (var s = 0; s < initial; s++) { weightedPick().forEach(function (i) { votes[i]++; }); done++; simIdx++; }
-    if (sent) { selected.forEach(function (i) { votes[i]++; }); done++; }
+    for (var s = 0; s < initial; s++) { addRatings(randomRatings()); done++; simIdx++; }
+    if (sent) { addRatings(ratings); done++; }
     $("feed").textContent = "";
     renderProgress(); renderRank();
     timer = setInterval(function () {
       var simDone = done - (sent ? 1 : 0);
       if (simDone >= TOTAL - 1) { clearInterval(timer); return; }
-      submitVotes(weightedPick(), NAMES[simIdx % NAMES.length], "participante");
+      submitVotes(randomRatings(), NAMES[simIdx % NAMES.length], "participante");
       simIdx++;
     }, 2300);
   }
@@ -363,44 +371,36 @@
   function esc(s) { return s.replace(/[&<>"]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]; }); }
 
   /* ---------- Selección ---------- */
-  var CHECK = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9"/></svg>';
   var listEl = $("list");
   DOLORES.forEach(function (t, i) {
     var b = document.createElement("div");
-    b.className = "row"; b.tabIndex = 0; b.setAttribute("role", "checkbox"); b.setAttribute("aria-checked", "false"); b.dataset.i = i;
-    b.innerHTML = '<span class="n">' + (i + 1) + '</span><span class="t"><span class="area">' + AREAS[i] + '</span>' + t + '</span><span class="info" role="button" tabindex="0" aria-label="Ver detalle del dolor ' + (i + 1) + '">i</span><span class="box">' + CHECK + '</span>';
-    b.addEventListener("click", function () { toggle(i); });
-    b.addEventListener("keydown", function (e) { if (e.target === b && (e.key === " " || e.key === "Enter")) { e.preventDefault(); toggle(i); } });
+    b.className = "row"; b.setAttribute("role", "group"); b.setAttribute("aria-label", "Dolor " + (i + 1)); b.dataset.i = i;
+    b.innerHTML = '<span class="n">' + (i + 1) + '</span><span class="t"><span class="area">' + AREAS[i] + '</span>' + t + '</span><span class="info" role="button" tabindex="0" aria-label="Ver detalle del dolor ' + (i + 1) + '">i</span>' +
+      '<span class="rate" role="radiogroup" aria-label="Calificación del dolor ' + (i + 1) + '">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-p="' + n + '" aria-pressed="false" aria-label="Calificar con ' + n + '">' + n + '</button>'; }).join("") + '</span>';
+    b.querySelector(".rate").addEventListener("click", function (e) {
+      var btn = e.target.closest("button"); if (!btn || sent) return;
+      var p = +btn.dataset.p; ratings[i] = ratings[i] === p ? 0 : p; renderSelection();
+    });
     listEl.appendChild(b);
   });
-  function toggle(i) {
-    if (sent) return;
-    if (!selected.has(i) && selected.size >= MAX) return;
-    if (selected.has(i)) selected.delete(i);
-    else if (selected.size < MAX) selected.add(i);
-    renderSelection();
-  }
   function renderSelection() {
-    var full = selected.size >= MAX;
+    var rated = 0;
     Array.prototype.forEach.call(listEl.children, function (b) {
-      var i = +b.dataset.i, on = selected.has(i);
-      b.setAttribute("aria-checked", on);
-      var lock = sent || (full && !on);
-      b.classList.toggle("locked", lock); b.setAttribute("aria-disabled", lock); b.tabIndex = lock ? -1 : 0;
+      var i = +b.dataset.i, v = ratings[i]; if (v) rated++;
+      b.classList.toggle("rated", v > 0);
+      Array.prototype.forEach.call(b.querySelectorAll(".rate button"), function (x) { x.setAttribute("aria-pressed", +x.dataset.p === v); x.disabled = sent; });
     });
-    $("cnt").textContent = selected.size;
-    $("send").disabled = sent || selected.size !== MAX;
-    $("send").textContent = sent ? "Enviado" : "Enviar selección";
-    $("hint").textContent = sent ? "Gracias, ya participaste." :
-      full ? "Llegaste a 8. Desmarca uno si quieres cambiar tu elección." :
-      "Te faltan " + (MAX - selected.size) + " para poder enviar.";
+    $("cnt").textContent = rated; $("cntTotal").textContent = DOLORES.length;
+    $("send").disabled = sent || rated !== DOLORES.length;
+    $("send").textContent = sent ? "Enviado" : "Enviar calificación";
+    $("hint").textContent = sent ? "Gracias, ya participaste." : rated === DOLORES.length ? "Listo: ya puedes enviar tu calificación." : "Te faltan " + (DOLORES.length - rated) + " dolores por calificar.";
     $("sentBanner").hidden = !sent;
     if (typeof applyFilter === "function") applyFilter();
   }
   $("send").addEventListener("click", function () {
-    if (sent || selected.size !== MAX) return;
+    if (sent || ratings.some(function (v) { return !v; })) return;
     sent = true;
-    submitVotes(Array.from(selected), user.nombre, user.cargo);
+    submitVotes(ratings.slice(), user.nombre, user.cargo);
     $("tabs").hidden = false;
     renderSelection(); showTab("rank");
   });
@@ -418,7 +418,7 @@
   DOLORES.forEach(function (t, i) {
     var r = document.createElement("div");
     r.className = "rrow";
-    r.innerHTML = '<div class="pos"></div><div class="name"><span class="area">' + AREAS[i] + '</span><span class="txt">' + t + '</span></div><div class="meter"><span></span></div><div class="pts"><span class="v">0</span><small>puntos</small></div>';
+    r.innerHTML = '<div class="pos"></div><div class="name"><span class="area">' + AREAS[i] + '</span><span class="txt">' + t + '</span></div><div class="meter"><span></span></div><div class="pts"><span class="v">0</span><small class="avg">prom. 0</small></div>';
     rankEl.appendChild(r); rrows[i] = r;
   });
   rankEl.style.height = DOLORES.length * ROW_H + "px";
@@ -430,9 +430,15 @@
       r.classList.toggle("win", pos < MAX && votes[idx] > 0);
       r.querySelector(".pos").textContent = pos + 1;
       r.querySelector(".v").textContent = votes[idx];
-      r.querySelector(".meter span").style.width = Math.min(100, votes[idx] / TOTAL * 100) + "%";
+      r.querySelector(".avg").textContent = "prom. " + (done ? (votes[idx] / done).toFixed(1) : "0");
+      r.querySelector(".meter span").style.width = Math.min(100, votes[idx] / (5 * TOTAL) * 100) + "%";
       r.style.zIndex = DOLORES.length - pos;
     });
+    renderStats();
+  }
+  function renderStats() {
+    var mx = Math.max.apply(null, votes), mn = Math.min.apply(null, votes);
+    $("rkStat").innerHTML = '<span class="hi">Mayor puntaje: ' + mx + '</span><span>Menor puntaje: ' + mn + '</span><span>Máximo posible: ' + 5 * TOTAL + ' (' + TOTAL + ' personas × 5)</span><span>Calificaron: ' + done + ' de ' + TOTAL + '</span>';
   }
 
   /* ---------- Filtro por área (desplegable, A a Z) ---------- */
@@ -452,8 +458,8 @@
     $("filterCount").textContent = filterArea ? "Mostrando " + shown + " dolores de " + filterArea : "Mostrando los " + shown + " dolores";
     Array.prototype.forEach.call(areaSel.options, function (o) {
       var total = 0, n = 0;
-      AREAS.forEach(function (a, i) { if (!o.value || a === o.value) { total++; if (selected.has(i)) n++; } });
-      o.textContent = (o.value || "Todas las áreas") + " (" + total + ")" + (n ? "  ·  " + n + (n === 1 ? " marcado" : " marcados") : "");
+      AREAS.forEach(function (a, i) { if (!o.value || a === o.value) { total++; if (ratings[i] > 0) n++; } });
+      o.textContent = (o.value || "Todas las áreas") + " (" + total + ")" + (n ? "  ·  " + n + (n === 1 ? " calificado" : " calificados") : "");
     });
     if (tip) tip.classList.remove("show");
   }
@@ -497,7 +503,7 @@
   $("tabVote").addEventListener("click", function () { showTab("vote"); });
   $("tabRank").addEventListener("click", function () { showTab("rank"); });
 
-  $("reset").addEventListener("click", function () { filterArea = ""; sent = false; $("tabs").hidden = true; selected.clear(); renderSelection(); showTab("vote"); startSim(11); });
+  $("reset").addEventListener("click", function () { filterArea = ""; sent = false; $("tabs").hidden = true; ratings = DOLORES.map(function () { return 0; }); renderSelection(); showTab("vote"); startSim(11); });
 
   renderSelection();
 })();
